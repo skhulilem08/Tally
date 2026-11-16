@@ -28,3 +28,31 @@ mtime_ms = 1794819543233
 storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:b3e557ab-bbf1-40f9-827c-283e8540fe4b/13929c44-a10a-4688-bfdb-ed4522976b3d/b624dc60-a05d-4b9d-a318-dbe819ba583d"
 storage_version_token = "1794819586208777"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "6Me6bLt-neGtTz451BjrU"
+uri = "file://.local/share/tally-preview/settings-light.png"
+type = "image"
+title = "Settings — light mode"
+description = "Actual mobile Settings screen with iOS-style grouped rows and device-only guest access."
+logical_id = "df75db6e-3d8c-4822-b5f7-0fa297fe1e77"
+content_hash = "sha256:2539faa1c58f82924e1393c5caa6e0f12abfc8e30dac246c5972a3b54ac6f0a1"
+size = 29111
+mtime_ms = 1794824083774
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:b3e557ab-bbf1-40f9-827c-283e8540fe4b/df75db6e-3d8c-4822-b5f7-0fa297fe1e77/5f6004a5-6488-4d93-91ef-dec8023b09ec"
+storage_version_token = "1794824480441578"
+content_type = "image/png"
+
+[[outputs]]
+id = "usb0vCQ_zxmnastPuMrOj"
+uri = "file://.local/share/tally-preview/settings-dark.png"
+type = "image"
+title = "Settings — dark mode"
+description = "The same Settings screen in dark mode with gold accents and solid surfaces."
+logical_id = "1c7f1a0f-b138-452e-bb15-d126b0cee8e8"
+content_hash = "sha256:b8f2bb8fc6fd089fb98e0cedee689f2b7781182853aad5174c3938398e8d0563"
+size = 29678
+mtime_ms = 1794824094226
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:b3e557ab-bbf1-40f9-827c-283e8540fe4b/1c7f1a0f-b138-452e-bb15-d126b0cee8e8/8c6a2fc6-e04c-4333-8e36-37c5714ad7d5"
+storage_version_token = "1794824480903469"
+content_type = "image/png"

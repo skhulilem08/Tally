@@ -163,6 +163,18 @@ For this web app, use WCAG 2.2 thresholds: normal text ≥4.5:1; large text ≥3
 - Preserve hierarchy at large text sizes; stack information rather than truncating important labels.
 - Do not disable pinch zoom or rely on native Dynamic Type APIs that the PWA does not implement.
 
+### Concise iOS interface copy
+
+**Confirmed correction:** native in Tally means recognisably iOS, not merely a responsive or generic mobile interface. Routine controls should be understandable from their familiar form, position, and concise label—not surrounded by website-style explanations.
+
+- Remove redundant marketing taglines, introductory paragraphs, repeated eyebrow labels, and subtitles that restate a screen title or action.
+- Prefer direct labels such as “Cookbook”, “Add recipe”, “Ingredients”, and “Save”; use actual recipe/list metadata instead of promotional description.
+- Use local supporting text only when it helps someone make a decision or recover: units, validation, empty-state next steps, offline/error status, privacy, unsaved changes, approval, or irreversible deletion.
+- Do not remove persistent input labels, screen-reader names, necessary warnings, or instructions that prevent an incorrect save just to reduce visible text.
+- An empty state may briefly explain what is missing and offer one useful next action. It must not become a marketing page.
+- In Settings, distinguish the guest kitchen with concise “Guest” / “On this device” metadata and a real Sign in row. Keep local-storage limitations in the user-opened privacy disclosure, not a promotional panel.
+- Judge copy together with hierarchy and control placement; deleting all paragraphs does not by itself create native iOS design.
+
 ### Iconography: Iconoir
 
 **Confirmed:** use **Iconoir** for Tally's interface icons, selecting simple outline glyphs closest in meaning and visual character to familiar iOS symbols. It is an independent library, not Apple SF Symbols or an exact reproduction of iOS icons.

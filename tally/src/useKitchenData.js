@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from './api.js'
+import { guestApi, GUEST_STORAGE_KEY } from './guestKitchen.js'
 
 const emptyKitchen = { recipes: [], lists: [] }
 const newestFirst = (records) => [...records].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 
 export function useKitchenData(userId, isSignedIn, isLoaded) {
-  const owner = isLoaded ? (isSignedIn ? userId : null) : `pending:${userId || ''}`
+  const owner = isLoaded ? (isSignedIn ? userId : 'guest') : `pending:${userId || ''}`
   const [snapshot, setSnapshot] = useState({ owner: null, data: emptyKitchen })
   const [loadState, setLoadState] = useState({ owner: null, loading: Boolean(isSignedIn), error: '' })
   const ownerRef = useRef(owner)
@@ -17,14 +18,17 @@ export function useKitchenData(userId, isSignedIn, isLoaded) {
     requestRef.current += 1
   }
 
+  const request = useCallback(async (path, options) => {
+    if (!isLoaded || ownerRef.current !== owner) throw new Error('Your kitchen changed. Please try again.')
+    const result = await (isSignedIn ? api : guestApi)(path, options)
+    if (ownerRef.current !== owner) throw new Error('Your kitchen changed. Please try again.')
+    return result
+  }, [isLoaded, isSignedIn, owner])
+
   const reload = useCallback(async ({ force = true } = {}) => {
     const requestOwner = owner
     if (!isLoaded) return
-    if (!isSignedIn || !userId) {
-      setSnapshot({ owner: null, data: emptyKitchen })
-      setLoadState({ owner: null, loading: false, error: '' })
-      return
-    }
+    if (isSignedIn && !userId) return
     if (ownerRef.current !== requestOwner) return
     if (!force && freshnessRef.current.owner === requestOwner && Date.now() - freshnessRef.current.at < 60_000) return
 
@@ -32,7 +36,7 @@ export function useKitchenData(userId, isSignedIn, isLoaded) {
     const hasCurrentData = snapshot.owner === requestOwner
     setLoadState({ owner: requestOwner, loading: !hasCurrentData, error: '' })
     try {
-      const result = await api('/bootstrap')
+      const result = await request('/bootstrap')
       if (ownerRef.current !== requestOwner || requestRef.current !== requestId) return
       setSnapshot({
         owner: requestOwner,
@@ -48,27 +52,30 @@ export function useKitchenData(userId, isSignedIn, isLoaded) {
         setLoadState({ owner: requestOwner, loading: false, error: error.message || 'Could not load your kitchen.' })
       }
     }
-  }, [isLoaded, isSignedIn, owner, snapshot.owner, userId])
+  }, [isLoaded, isSignedIn, owner, request, snapshot.owner, userId])
 
   useEffect(() => {
     if (!isLoaded) return
-    if (!isSignedIn || !userId) {
-      setSnapshot({ owner: null, data: emptyKitchen })
-      setLoadState({ owner: null, loading: false, error: '' })
-      return
-    }
+    if (isSignedIn && !userId) return
     void reload({ force: false })
   }, [isLoaded, isSignedIn, reload, userId])
 
   useEffect(() => {
     const onFocus = () => { void reload({ force: false }) }
+    const onStorage = (event) => {
+      if (owner === 'guest' && (event.key === GUEST_STORAGE_KEY || event.key === null)) void reload()
+    }
     window.addEventListener('focus', onFocus)
-    return () => window.removeEventListener('focus', onFocus)
-  }, [reload])
+    window.addEventListener('storage', onStorage)
+    return () => {
+      window.removeEventListener('focus', onFocus)
+      window.removeEventListener('storage', onStorage)
+    }
+  }, [owner, reload])
 
   const ownsCurrentAccount = useCallback((capturedOwner) => (
-    ownerRef.current === capturedOwner && capturedOwner === owner && isLoaded && isSignedIn
-  ), [isLoaded, isSignedIn, owner])
+    ownerRef.current === capturedOwner && capturedOwner === owner && isLoaded
+  ), [isLoaded, owner])
 
   const replaceList = useCallback((list) => {
     if (!ownsCurrentAccount(owner)) return
@@ -115,7 +122,9 @@ export function useKitchenData(userId, isSignedIn, isLoaded) {
   return {
     recipes: hasData ? snapshot.data.recipes : [],
     lists: hasData ? snapshot.data.lists : [],
-    loading: !isLoaded ? false : Boolean(isSignedIn) && (loadState.owner !== owner || load.loading),
+    loading: !isLoaded || loadState.owner !== owner || load.loading,
+    request,
+    isGuest: isLoaded && !isSignedIn,
     error: load.error,
     reload,
     setError,

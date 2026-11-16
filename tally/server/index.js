@@ -4,9 +4,9 @@ import { logger } from './logger.js'
 
 await migrate()
 const port = Number(process.env.PORT) || 3001
-// In development only Vite is public; it proxies /api to this private listener.
-// Exposing both listeners can make Preview select the API instead of the UI.
-const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : '127.0.0.1'
+// Development serves the Vite UI on non-API paths too, so Preview remains valid
+// whichever listener its existing forwarding configuration selects.
+const host = '0.0.0.0'
 const server = app.listen(port, host, () => logger.info({ port, host }, 'Tally API is ready'))
 async function shutdown() {
   server.close(async () => {

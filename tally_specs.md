@@ -249,9 +249,13 @@ Blueprint example: 300g beef for 2 servings becomes 600g for 4; 200g usable on h
 
 ## 9. Account, privacy, and media
 
-- **Confirmed:** authentication protects private recipes, lists, conversations, and relevant preferences.
+- **Confirmed:** authentication protects private **cloud** recipes, lists, conversations, and relevant preferences. Guest use is available without creating an account.
+- **Confirmed guest choice:** guests can save recipes and grocery lists **on this device**, in this browser's local storage. Guest create/edit/delete, explicit list approval, quantity calculations, and shopping check-off must persist across reloads.
+- Keep the guest kitchen separate from every signed-in cloud account. Signing in must not silently upload/merge guest records; signing out must not erase them. A cloud authentication or network failure must never redirect a signed-in save into guest storage.
+- Guest data is not an authenticated cloud backup: anyone using that browser profile may access it, and clearing site/browser data removes it. Surface this distinction concisely in Settings and its privacy disclosure. Report blocked/full/corrupt storage explicitly instead of claiming a successful save.
+- Cloud AI chat remains account-only; guest recipe/list operations do not send their local records to the cloud.
 - Derive account identity from the authenticated server session, never a client-supplied owner ID.
-- Authorise every read, write, AI operation, and media access against that account.
+- Authorise every **cloud** read, write, AI operation, and media access against that account.
 - Keep provider secrets server-side; never bundle secrets into frontend code.
 - Validate text, quantities, units, file type/size, and ownership.
 - Store media bytes in object storage, separate from structured recipe records.
@@ -279,6 +283,7 @@ Apply [ui_design_skill.md](ui_design_skill.md) as the detailed design implementa
 - Support 200% text enlargement, keyboard access, text alternatives to audio, and reduced motion.
 - Include empty, loading, no-results, offline, denied-permission, upload, failure/retry, draft, and saved states.
 - UI content must accurately reflect storage, recording, and sync state.
+- Target recognisable **iOS** composition and controls, not generic mobile styling. Keep routine screen/action labels concise; remove redundant taglines, explanatory subtitles, and helper copy while retaining essential labels, units, validation, privacy, and save/delete/approval context.
 
 ### Native sections and content grouping
 

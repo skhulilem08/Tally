@@ -6,6 +6,7 @@ import pinoHttp from 'pino-http'
 import { clerkMiddleware, getAuth } from '@clerk/express'
 import { publishableKeyFromHost } from '@clerk/shared/keys'
 import { rateLimit } from 'express-rate-limit'
+import { createProxyMiddleware } from 'http-proxy-middleware'
 import { z } from 'zod'
 import { pool, record } from './db.js'
 import { logger } from './logger.js'
@@ -203,6 +204,15 @@ if (process.env.NODE_ENV === 'production') {
     if (filePath.endsWith('index.html') || filePath.endsWith('sw.js')) res.setHeader('Cache-Control', 'no-cache')
   } }))
   app.get('/{*path}', (_req, res) => res.sendFile(path.join(dist, 'index.html')))
+} else {
+  // Legacy Preview can retain the API port as its selected target. Serve the
+  // same Vite UI there too; /api routes above remain authenticated and never
+  // enter this proxy, so either development listener is a valid app entry.
+  app.use(createProxyMiddleware({
+    target: `http://127.0.0.1:${Number(process.env.TALLY_FRONTEND_PORT) || 5000}`,
+    changeOrigin: false,
+    ws: true,
+  }))
 }
 app.use((error, req, res, _next) => {
   if (error instanceof z.ZodError) {
