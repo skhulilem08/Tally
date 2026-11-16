@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { ClerkProvider, SignIn, SignUp, useClerk, useUser } from '@clerk/react'
 import { publishableKeyFromHost } from '@clerk/react/internal'
 import { shadcn } from '@clerk/themes'
@@ -12,6 +13,7 @@ import {
 import { api } from './api.js'
 import { useKitchenData } from './useKitchenData.js'
 import './App.css'
+import './assistant.css'
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '')
 const clerkPubKey = publishableKeyFromHost(window.location.hostname, import.meta.env.VITE_CLERK_PUBLISHABLE_KEY)
@@ -228,14 +230,15 @@ function AppShell({ children }) {
     else setLocation(backPath)
   }
   const isHome = location === '/' || location === '/home'
+  const isGroceries = location === '/groceries'
   return (
-    <div className={`app-shell ${location === '/settings' ? 'settings-shell' : ''} ${isHome ? 'home-shell' : ''}`}>
-      {!isHome && <header className="topbar">
+    <div className={`app-shell ${location === '/settings' ? 'settings-shell' : ''} ${isHome ? 'home-shell' : ''} ${location === '/cookbook' ? 'cookbook-shell' : ''} ${isGroceries ? 'groceries-shell' : ''} ${location === '/assistant' ? 'assistant-shell' : ''}`}>
+      {!isHome && location !== '/cookbook' && !isGroceries && <header className="topbar">
         {isDetail ? <button className="back-button" type="button" onClick={goBack} aria-label="Go back" title="Go back"><ArrowLeft size={21} /></button> : <div className="brand-lockup"><span className="brand-mark"><CookingPot size={18} /></span><span>Tally</span></div>}
         <span className="topbar-context">{isDetail ? current.label : 'Your kitchen, kept close'}</span>
         <div className={`topbar-side ${online ? '' : 'offline-indicator'}`}>{online ? 'Personal cookbook' : 'Offline · may not sync'}</div>
       </header>}
-      <main className={`screen-content ${isHome ? 'home-screen-content' : ''}`} key={current.href}>{children}</main>
+      <main className={`screen-content ${isHome ? 'home-screen-content' : ''} ${location === '/cookbook' ? 'cookbook-screen-content' : ''} ${isGroceries ? 'groceries-screen-content' : ''} ${location === '/assistant' ? 'assistant-screen-content' : ''}`} key={current.href}>{children}</main>
       <nav className="tabbar" aria-label="Main navigation">
         {tabs.map(({ href, label, Icon }, index) => {
           const selected = location === href || (href === '/home' && location === '/') || (href !== '/home' && location.startsWith(href))
@@ -366,19 +369,75 @@ function Home({ kitchen, isSignedIn, canUseKitchen, user }) {
 function Cookbook({ kitchen, canUseKitchen, user }) {
   const queryKey = `tally-search:${user?.id || 'signed-out'}`
   const [query, setQuery] = useState(() => sessionStorage.getItem(queryKey) || '')
+  const [searchOpen, setSearchOpen] = useState(() => Boolean(sessionStorage.getItem(queryKey)))
+  const searchInputRef = useRef(null)
+  const searchToggleRef = useRef(null)
   useEffect(() => { sessionStorage.setItem(queryKey, query) }, [query, queryKey])
   const matches = useMemo(() => kitchen.recipes.filter((recipe) => `${recipe.title} ${recipe.description || ''} ${(recipe.ingredients || []).map((item) => item.name).join(' ')}`.toLowerCase().includes(query.toLowerCase())), [kitchen.recipes, query])
-  if (!canUseKitchen) return <div className="page"><LoadingRows /></div>
-  return <div className="page">
-    <ScreenTitle eyebrow="Your collection" title="Cookbook" detail="The ones you make, the way you make them." action={<Link className="icon-button accent-icon" href="/cookbook/new" aria-label="Create a recipe"><Plus size={21} /></Link>} />
-    <label className="search-field"><Search size={19} /><span className="sr-only">Search recipes and ingredients</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search recipes or ingredients" /><button type="button" className={`clear-search ${query ? 'visible' : ''}`} onClick={() => setQuery('')} aria-label="Clear search" disabled={!query}><X size={17} /></button></label>
+  const toggleSearch = () => {
+    if (searchOpen) {
+      flushSync(() => {
+        setQuery('')
+        setSearchOpen(false)
+      })
+      searchToggleRef.current?.focus()
+    } else {
+      // Keep focus in the tap event so iOS can open the software keyboard.
+      flushSync(() => setSearchOpen(true))
+      searchInputRef.current?.focus({ preventScroll: true })
+    }
+  }
+  return <div className="page cookbook-page">
+    <header className="cookbook-native-header">
+      <button ref={searchToggleRef} type="button" className="cookbook-search-toggle" onClick={toggleSearch} aria-label={searchOpen ? 'Close recipe search' : 'Search recipes'} aria-expanded={searchOpen} aria-controls="cookbook-search-region" data-testid="cookbook-search-toggle"><Search size={19} /></button>
+      <h1>Cookbook</h1>
+      <Link className="cookbook-add-button" href="/cookbook/new" aria-label="Add recipe" data-testid="cookbook-add-recipe"><Plus size={21} /></Link>
+    </header>
+    <div id="cookbook-search-region" className={`cookbook-search-region ${searchOpen ? 'is-open' : ''}`} aria-hidden={!searchOpen} inert={!searchOpen}>
+      <label className="cookbook-search">
+        <Search size={19} aria-hidden="true" />
+        <span className="sr-only">Search recipes and ingredients</span>
+        <input ref={searchInputRef} type="search" enterKeyHint="search" value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Escape') { event.preventDefault(); toggleSearch() } }} placeholder="Search recipes or ingredients" disabled={!searchOpen} data-testid="cookbook-search" />
+        <button type="button" className={`cookbook-clear-search ${query ? 'visible' : ''}`} onClick={() => setQuery('')} aria-label="Clear search" disabled={!query || !searchOpen} data-testid="cookbook-clear-search"><X size={17} /></button>
+      </label>
+    </div>
     <ErrorNotice onRetry={kitchen.reload}>{kitchen.error}</ErrorNotice>
-    {kitchen.loading ? <LoadingRows /> : matches.length ? <div className="recipe-list">{matches.map((recipe) => <RecipeRow key={recipe.id} recipe={recipe} />)}</div> : query ? <EmptyState icon={<Search size={22} />} title="Nothing found" detail={`No recipes match “${query}”. Try a different name or ingredient.`} /> : <EmptyState icon={<BookOpen size={23} />} title="A place for your favourites" detail="Your cookbook will hold the recipes you actually make. Add one whenever you’re ready." action={<Link className="button button-primary" href="/cookbook/new"><Plus size={17} /> Add your first recipe</Link>} />}
+    {!canUseKitchen || kitchen.loading
+      ? <div className="cookbook-skeleton" aria-label="Loading your recipes"><span /><span /><span /></div>
+      : matches.length
+        ? <>
+            <p className="cookbook-result-count" aria-live="polite">{matches.length} {matches.length === 1 ? 'recipe' : 'recipes'}</p>
+            <div className="cookbook-card-grid" aria-label="Saved recipes">{matches.map((recipe) => <RecipeCard key={recipe.id} recipe={recipe} />)}</div>
+          </>
+        : kitchen.error
+          ? <div className="cookbook-load-error"><BookOpen size={22} /><p>Your recipes couldn’t be loaded.</p></div>
+          : query
+            ? <EmptyState icon={<Search size={22} />} title="No matching recipes" detail={`No recipes match “${query}”. Try another name or ingredient.`} />
+            : <EmptyState icon={<BookOpen size={23} />} title="No recipes yet" detail="Your saved recipes will live here." />}
   </div>
 }
-function RecipeRow({ recipe }) {
-  return <Link className="recipe-row" href={`/cookbook/${recipe.id}`} data-testid={`recipe-${recipe.id}`}>
-    <div className="recipe-initial">{(recipe.title || '?').trim().slice(0, 1).toUpperCase()}</div><div className="recipe-row-copy"><strong>{recipe.title}</strong><span>{recipe.description || `${recipe.servings} servings · ${(recipe.ingredients || []).length} ingredients`}</span></div><ChevronRight size={19} className="row-chevron" />
+function RecipeCard({ recipe }) {
+  const ingredientCount = (recipe.ingredients || []).length
+  const ingredients = (recipe.ingredients || []).map((item) => item.name?.trim()).filter(Boolean)
+  return <Link className="cookbook-recipe-card" href={`/cookbook/${recipe.id}`} aria-label={`Open ${recipe.title}`} data-testid={`recipe-${recipe.id}`}>
+    <span className="cookbook-card-media" aria-hidden="true">
+      <span className="cookbook-no-photo-symbol"><BookOpen size={25} /></span>
+      <span className="cookbook-no-photo-label">No photo</span>
+      <ChevronRight size={17} className="cookbook-card-chevron" />
+    </span>
+    <span className="cookbook-card-body">
+      <strong className="cookbook-card-title">{recipe.title}</strong>
+      {recipe.description && <span className="cookbook-card-description">{recipe.description}</span>}
+      <span className="cookbook-card-metadata">
+        {recipe.servings != null && <span>{recipe.servings} servings</span>}
+        {recipe.prepMinutes != null && <span>Prep {recipe.prepMinutes} min</span>}
+        {recipe.cookMinutes != null && <span>Cook {recipe.cookMinutes} min</span>}
+      </span>
+      <span className="cookbook-card-ingredients">
+        <span>{ingredientCount} {ingredientCount === 1 ? 'ingredient' : 'ingredients'}</span>
+        {ingredients.length > 0 && <span className="cookbook-card-ingredient-names">{ingredients.slice(0, 3).join(' · ')}{ingredients.length > 3 ? ' · …' : ''}</span>}
+      </span>
+    </span>
   </Link>
 }
 function EmptyState({ icon, title, detail, action }) {
@@ -571,12 +630,19 @@ function Assistant({ kitchen, isSignedIn, user }) {
     finally { setBusy(false) }
   }
   return <div className="page assistant-page">
-    <ScreenTitle eyebrow="AI Assistant" title="Let’s figure it out" detail="Talk through a recipe or a shopping plan, one thought at a time." />
-    {!isSignedIn ? <SignInPrompt title="Your cooking companion" children="Sign in to start a private conversation and keep approved recipes in your cookbook." /> : <>
-      <div className="assistant-shortcuts"><Link href={latestRecipe ? `/cookbook/${latestRecipe.id}` : '/cookbook'} className="shortcut-chip"><BookOpen size={16} /><span>{latestRecipe ? `Latest recipe · ${latestRecipe.title}` : 'Your cookbook'}</span><ChevronRight size={15} /></Link><Link href={latestList ? `/groceries/${latestList.id}` : '/groceries'} className="shortcut-chip"><ShoppingBasket size={16} /><span>{latestList ? `Latest list · ${latestList.name}` : 'Grocery lists'}</span><ChevronRight size={15} /></Link></div>
+    <header className="assistant-native-header"><span aria-hidden="true" /><h1>AI Assistant</h1><span aria-hidden="true" /></header>
+    <nav className="assistant-shortcuts" aria-label="Your kitchen">
+      <Link href={latestRecipe ? `/cookbook/${latestRecipe.id}` : '/cookbook'} className="shortcut-chip" data-testid="assistant-latest-recipe"><BookOpen size={18} /><span><small>{latestRecipe ? 'Latest recipe' : 'Cookbook'}</small><strong>{latestRecipe?.title || 'Browse recipes'}</strong></span><ChevronRight size={16} /></Link>
+      <Link href={latestList ? `/groceries/${latestList.id}` : '/groceries'} className="shortcut-chip" data-testid="assistant-latest-list"><ShoppingBasket size={18} /><span><small>{latestList ? 'Latest grocery list' : 'Groceries'}</small><strong>{latestList?.name || 'View your lists'}</strong></span><ChevronRight size={16} /></Link>
+    </nav>
+    {!isSignedIn ? <section className="assistant-guest" aria-labelledby="assistant-guest-title">
+      <span className="assistant-guest-icon"><UserRound size={20} /></span>
+      <div className="assistant-guest-copy"><h2 id="assistant-guest-title">Sign in to chat</h2><p>Your guest kitchen stays on this device.</p></div>
+      <div className="assistant-guest-actions"><Link href="/sign-in" className="assistant-auth-link">Sign in<ChevronRight size={15} /></Link><Link href="/sign-up" className="assistant-auth-link">Create account<ChevronRight size={15} /></Link></div>
+    </section> : <>
       <section className="conversation-panel" aria-label="Text conversation">
         <div className="conversation-feed" ref={feedRef} aria-live="polite">
-          {messages.length === 0 && <div className="assistant-welcome"><span className="assistant-orbit"><Sparkles size={21} /></span><div><strong>Start wherever you are.</strong><p>Tell me what you’ve been making, or what you’re hoping to cook. I’ll help shape it into a recipe draft for you to review.</p></div></div>}
+          {messages.length === 0 && <div className="assistant-welcome"><span className="assistant-orbit"><Sparkles size={21} /></span><div><strong>What are we cooking?</strong></div></div>}
           {messages.map((message, index) => <div className={`message message-${message.role}`} key={`${index}-${message.role}`}><span className="message-label">{message.role === 'assistant' ? 'Tally' : 'You'}</span><p>{message.content}</p></div>)}
           {busy && <div className="typing-line"><span /><span /><span /><span className="sr-only">Tally is thinking</span></div>}
         </div>
@@ -595,7 +661,7 @@ function Assistant({ kitchen, isSignedIn, user }) {
           <label className="field-label">Notes<textarea rows="2" value={draft.notes || ''} onChange={(e) => editDraft('notes', e.target.value)} placeholder="Optional notes" /></label>
           <div className="draft-actions"><button type="button" className="button button-primary button-full" onClick={approve} disabled={busy}>{busy ? 'Saving…' : <><Check size={18} /> Approve &amp; Save</>}</button><button type="button" className="button button-secondary button-full" onClick={() => { setInput('Could we adjust this recipe?'); document.getElementById('assistant-message')?.focus() }}>Continue conversation</button></div>
         </section>}
-        <form className="message-composer" onSubmit={send}><label htmlFor="assistant-message" className="sr-only">Message Tally</label><textarea id="assistant-message" rows="1" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); e.currentTarget.form.requestSubmit() } }} placeholder="Tell me what’s on your mind…" /><button className="send-button" type="submit" disabled={!input.trim() || busy} aria-label="Send message"><Send size={19} /></button></form>
+        <form className="message-composer" onSubmit={send}><label htmlFor="assistant-message" className="sr-only">Message Tally</label><textarea id="assistant-message" rows="1" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); e.currentTarget.form.requestSubmit() } }} placeholder="Message Tally…" /><button className="send-button" type="submit" disabled={!input.trim() || busy} aria-label="Send message"><Send size={19} /></button></form>
       </section>
       <p className="quiet-note"><CheckCircle2 size={15} /> Recipes stay drafts until you choose Approve &amp; Save.</p>
     </>}
@@ -603,16 +669,67 @@ function Assistant({ kitchen, isSignedIn, user }) {
 }
 
 function Groceries({ kitchen, canUseKitchen }) {
-  if (!canUseKitchen) return <div className="page"><LoadingRows /></div>
-  return <div className="page">
-    <ScreenTitle eyebrow="Shopping, at your pace" title="Groceries" detail="Lists you’ve reviewed and saved." action={<Link href="/groceries/plan" className="icon-button accent-icon" aria-label="Plan a grocery list"><Plus size={21} /></Link>} />
+  const lists = kitchen.lists || []
+  const latest = lists[0]
+  const groupedLists = new Map()
+  lists.slice(1).forEach((list) => {
+    const date = dateLabel(list.createdAt) || 'Date unavailable'
+    if (!groupedLists.has(date)) groupedLists.set(date, [])
+    groupedLists.get(date).push(list)
+  })
+  const earlierGroups = [...groupedLists.entries()]
+  const inCartCount = (list) => (list.items || []).filter((item) => item.checked).length
+  const itemCount = (list) => (list.items || []).length
+
+  return <div className="page groceries-page">
+    <header className="groceries-native-header">
+      <span aria-hidden="true" />
+      <h1>Groceries</h1>
+      <Link href="/groceries/plan" className="groceries-add-button" aria-label="Plan a grocery list" data-testid="groceries-plan">
+        <Plus size={21} />
+      </Link>
+    </header>
     <ErrorNotice onRetry={kitchen.reload}>{kitchen.error}</ErrorNotice>
-    {kitchen.loading ? <LoadingRows /> : <>
-      {kitchen.lists[0] && <section className="latest-list-card"><p className="eyebrow">Latest list</p><Link href={`/groceries/${kitchen.lists[0].id}`} className="latest-list-link"><div><h2>{kitchen.lists[0].name}</h2><p>{dateLabel(kitchen.lists[0].createdAt)}</p></div><span className="latest-progress">{kitchen.lists[0].items?.filter((item) => item.checked).length || 0}/{kitchen.lists[0].items?.length || 0}<small>in cart</small></span><ChevronRight size={20} /></Link></section>}
-      <div className="list-heading"><h2>{kitchen.lists.length > 1 ? 'Earlier lists' : kitchen.lists.length ? 'Your saved lists' : 'Your lists'}</h2>{kitchen.lists.length > 0 && <span>{kitchen.lists.length} {kitchen.lists.length === 1 ? 'list' : 'lists'}</span>}</div>
-      {kitchen.lists.length > 1 ? <div className="history-list">{kitchen.lists.slice(1).map((list) => <Link className="history-row" href={`/groceries/${list.id}`} key={list.id}><span className="history-icon"><ShoppingBasket size={19} /></span><span><strong>{list.name}</strong><small>{dateLabel(list.createdAt)} · {list.items?.length || 0} items</small></span><ChevronRight size={18} /></Link>)}</div> : !kitchen.lists.length && <EmptyState icon={<ShoppingBasket size={22} />} title="Nothing on the list yet" detail="Make a list from the recipes you’re planning to cook. You’ll review it before it’s saved." action={<Link className="button button-primary" href="/groceries/plan"><Plus size={17} /> Plan a grocery list</Link>} />}
-      <Link href="/groceries/plan" className="plan-another"><span className="tile-symbol orange-symbol"><Plus size={19} /></span><span><strong>Plan a grocery list</strong><small>Choose recipes and what you have on hand</small></span><ChevronRight size={18} /></Link>
-    </>}
+    {!canUseKitchen || kitchen.loading
+      ? <div className="groceries-skeleton" aria-label="Loading grocery lists"><span /><span /><span /></div>
+      : latest
+        ? <>
+            <section className="groceries-latest-section" aria-labelledby="groceries-latest-heading">
+              <h2 className="groceries-section-heading" id="groceries-latest-heading">Latest list</h2>
+              <Link className="groceries-latest-card" href={`/groceries/${latest.id}`} data-testid={`groceries-list-${latest.id}`}>
+                <span className="groceries-latest-topline">{dateLabel(latest.createdAt) || 'Date unavailable'}<ChevronRight size={17} /></span>
+                <span className="groceries-latest-name">{latest.name}</span>
+                <span className="groceries-latest-progress">{inCartCount(latest)} of {itemCount(latest)} in cart</span>
+                {itemCount(latest) > 0
+                  ? <span className="groceries-preview-list">
+                      {latest.items.slice(0, 3).map((item) => <span className="groceries-preview-row" key={item.id}>
+                        <span className={`groceries-preview-mark ${item.checked ? 'is-checked' : ''}`} aria-hidden="true">{item.checked && <Check size={14} />}</span>
+                        <span className="groceries-preview-name">{item.name}</span>
+                        {(item.amount || item.unit) && <span className="groceries-preview-amount">{[item.amount, item.unit].filter(Boolean).join(' ')}</span>}
+                        {item.checked && <span className="groceries-preview-cart">In cart</span>}
+                      </span>)}
+                      {itemCount(latest) > 3 && <span className="groceries-preview-more">{itemCount(latest) - 3} more items</span>}
+                    </span>
+                  : <span className="groceries-preview-empty">No items in this list.</span>}
+              </Link>
+            </section>
+            {earlierGroups.length > 0 && <section className="groceries-history" aria-labelledby="groceries-history-heading">
+              <h2 className="groceries-section-heading" id="groceries-history-heading">Earlier lists</h2>
+              {earlierGroups.map(([date, group]) => <section className="groceries-date-group" key={date} aria-label={date}>
+                <h3>{date}</h3>
+                <div className="groceries-history-group">
+                  {group.map((list) => <Link className="groceries-history-row" href={`/groceries/${list.id}`} key={list.id} data-testid={`groceries-list-${list.id}`}>
+                    <span className="groceries-history-symbol"><ShoppingBasket size={18} /></span>
+                    <span className="groceries-history-copy"><strong>{list.name}</strong><small>{inCartCount(list)} of {itemCount(list)} in cart</small></span>
+                    <ChevronRight size={17} className="groceries-history-chevron" />
+                  </Link>)}
+                </div>
+              </section>)}
+            </section>}
+          </>
+        : kitchen.error
+          ? <div className="groceries-empty-state"><span className="groceries-empty-symbol"><ShoppingBasket size={22} /></span><h2>Lists unavailable</h2><p>Your saved lists couldn’t be loaded.</p></div>
+          : <div className="groceries-empty-state"><span className="groceries-empty-symbol"><ShoppingBasket size={22} /></span><h2>No saved lists</h2><p>Plan a list when you’re ready.</p></div>}
   </div>
 }
 

@@ -5,9 +5,9 @@ description: Legacy forwarding can change during workflow management; localhost 
 
 Verify Tally through the public development preview proxy after workflow or package-management changes, not just through localhost.
 
-**Why:** The React frontend responded successfully locally while Preview reached the API and returned “Cannot GET /”. A managed workflow restart also regenerated `.replit` without its manually validated legacy port mapping.
+**Why:** The React frontend responded successfully locally while Preview reached the API and returned “Cannot GET /”. On another occasion, an unrelated auxiliary Node listener was auto-selected and the public UI and API both returned plain “Running”, despite healthy Tally services. A managed workflow restart can regenerate `.replit` without its validated legacy port mapping.
 
-**How to apply:** Check the proxied root, a client-side deep link, and the API's expected signed-out response after the final restart. If the frontend works locally but Preview returns API HTML or a gateway error, inspect forwarding before restarting again. Check that any required mapping survived workflow management. A reachable development listener must not become a bare-API dead end when Preview selects it.
+**How to apply:** Check the proxied root, a client-side deep link, and the API's expected signed-out response after the final restart. If the frontend works locally but Preview returns API HTML, plain “Running”, or a gateway error, inspect forwarding before restarting again. Keep the public mapping directed at Tally's frontend, not an auxiliary listener, and check that the required mapping survived workflow management. A reachable development listener must not become a bare-API or helper-service dead end when Preview selects it.
 
 A passing production build and HTTP 200 HTML are not sufficient after replacing frontend dependencies.
 

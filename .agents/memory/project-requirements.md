@@ -51,6 +51,18 @@ Use the small Cookbook/All lists chevrons consistently for Home navigation label
 
 **How to apply:** Keep these navigation affordances in the shared Hugeicons family without changing their destinations or the accepted Home layout.
 
+Use both supplied food-app references together with approved Home and Settings when designing Cookbook.
+
+**Why:** The user asked, “Use these and the home page and settings design to be consistent when designing cookbook page”.
+
+**How to apply:** Use the Cookbook-specific references in `ui_design_skill.md` for native recipe composition, but retain the shared visual system and real personal cookbook content. Preserve Home and Settings.
+
+In Cookbook, use the header plus instead of a duplicate Add recipe button, and reveal search from its icon.
+
+**Why:** The user explicitly removed the extra Add recipe button because the plus already exists, and asked to hide search until its icon is clicked, revealing it with animation.
+
+**How to apply:** Preserve this restrained toolbar pattern, including empty states. Keep the query visible when restoring an active search and respect reduced motion. The user subsequently clarified that Search belongs on the left and plus on the right, with the title centred between balanced sides—not both icons at one end.
+
 Use solid filled components, not decorative outlined cards or controls.
 
 **Why:** The user explicitly instructed, “No outline ... on component as they are solid”.
