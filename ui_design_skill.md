@@ -11,6 +11,12 @@ Companion: [Tally product specification](tally_specs.md).
 
 Product update: incorporates *Specification Addendum 01 — Native-first app, five-tab navigation* from `attached_assets/AI_Kitchen_Native_App_Design_Update_v1_1_1794819465733.pdf`. It supersedes earlier three-tab/header-Settings guidance. The user's JavaScript/PWA, strict native experience, and no–Liquid Glass instructions remain unchanged.
 
+Current focus: Settings only. The user rejected the prior screen as not yet having a high-end iOS look; merely using grouped white rows is insufficient. Refine the actual native hierarchy, typography, account treatment, control geometry, spacing and interaction quality using the supplied images and HIG, without adding fake preferences or feature-promotional copy. IndexedDB and Settings sync tracking are deferred in [indexeddb_sync_plan.md](indexeddb_sync_plan.md); do not present them as active features.
+
+Settings visual target: `attached_assets/IMG_1983_1794826405287.webp`. Follow its compact centred title, circular toolbar controls, inset rounded groups, monochrome circular icon badges, aligned thin row dividers, light-grey/white and true-black/charcoal surfaces. Apply the look to actual Tally settings, not the reference's finance-specific options. Retain Tally's five labelled tabs; do not imitate the reference's device frame, status bar or home indicator.
+
+The user approved this direction and requested larger corner radii and more solid iOS-like colours. Preserve the layout; use fully opaque pure-white light surfaces, neutral light-grey surroundings, black text, and true-black/charcoal dark surfaces with white text. Avoid warm/off-white tints or lavender in Settings. Use semantic colour roles with light/dark variants, following [Apple HIG colour guidance](https://developer.apple.com/design/human-interface-guidelines/color); the browser palette is an approximation, not access to UIKit's dynamically resolved colours. Keep the no–Liquid Glass rule.
+
 ## 1. Purpose and authority
 
 Design a personal kitchen companion that feels refined, calm, premium, and easy to use while cooking or shopping. The person's recipes and current task are more important than decorative interface elements.
@@ -175,14 +181,14 @@ For this web app, use WCAG 2.2 thresholds: normal text ≥4.5:1; large text ≥3
 - In Settings, distinguish the guest kitchen with concise “Guest” / “On this device” metadata and a real Sign in row. Keep local-storage limitations in the user-opened privacy disclosure, not a promotional panel.
 - Judge copy together with hierarchy and control placement; deleting all paragraphs does not by itself create native iOS design.
 
-### Iconography: Iconoir
+### Iconography: Hugeicons
 
-**Confirmed:** use **Iconoir** for Tally's interface icons, selecting simple outline glyphs closest in meaning and visual character to familiar iOS symbols. It is an independent library, not Apple SF Symbols or an exact reproduction of iOS icons.
+**Confirmed:** use **Hugeicons** for Tally's interface icons. The user's latest instruction supersedes the earlier Iconoir choice. Select simple outline glyphs that fit familiar iOS meanings; Hugeicons is not Apple SF Symbols.
 
-- Use `iconoir-react` consistently through the shared interface-icon adapter; do not mix Lucide or another unrelated icon family into screens.
-- Working five-tab mapping: Home → `HomeSimpleDoor`; Cookbook → `OpenBook`; AI Assistant → `Sparks`; Groceries → `ShoppingBag`; Settings → `Settings`.
+- Use `@hugeicons/react` with `@hugeicons/core-free-icons` consistently through the shared interface-icon adapter. Do not mix Iconoir, Lucide or another interface icon family into screens.
+- Working five-tab mapping: Home → `Home01Icon`; Cookbook → `BookOpen01Icon`; AI Assistant → `SparklesIcon`; Groceries → `ShoppingBasket01Icon`; Settings → `Settings02Icon`.
 - Use a coherent outline treatment, inherited semantic colour, and optical alignment. The current working stroke is 1.5, with restrained 1.8 emphasis for active/central navigation; these are Tally choices, not Apple-mandated values.
-- Iconoir uses a 24×24 design grid and accepts standard SVG props. Set explicit rendered dimensions by context; keep the surrounding hit area large enough regardless of glyph size. [I1]
+- Hugeicons' free Stroke Rounded family uses a 24×24 grid; the React renderer supports explicit size, colour and stroke width. Keep the surrounding hit area large enough regardless of glyph size. [I1]
 - Preserve tab labels, accessible button names, and visible state cues. Decorative SVGs are hidden from assistive technology; an icon-only action still needs a meaningful accessible name.
 - Custom brand artwork/app icons are a separate asset category, not permission to introduce a second family of interface glyphs. Do not replace a meaningful symbol with a merely similar-looking but misleading one.
 
@@ -415,7 +421,7 @@ Project guide names here describe how to apply the relevant supplied skills; the
 
 - [ ] Native appearance **and interaction** pass real-phone review; “responsive website” is not an acceptable substitute.
 - [ ] Apple HIG is the primary design basis; images inform its visual interpretation and NN/G remains supporting research.
-- [ ] Interface glyphs use Iconoir consistently, with coherent dimensions/strokes, semantic meaning, large hit areas, and accessible labels.
+- [ ] Interface glyphs use Hugeicons consistently, with coherent dimensions/strokes, semantic meaning, large hit areas, and accessible labels.
 - [ ] Actual screens were compared against the supplied images for composition, hierarchy, grouping, controls, and spacing—not just food photography.
 - [ ] Elements match their purpose: logical headings, labelled fields, navigation links for destinations, buttons for actions, and correctly exposed selection/status.
 - [ ] Repeated controls and all supporting/auth/error screens use the same component contracts and semantic tokens.
@@ -476,4 +482,4 @@ Project guide names here describe how to apply the relevant supplied skills; the
 - **[A16]** Apple Developer, [SwiftUI: Section](https://developer.apple.com/documentation/swiftui/section). Structural reference for grouping with optional headers/footers, not a Tally framework choice.
 - **[A17]** Apple Developer, [WWDC20: Lists in UICollectionView](https://developer.apple.com/videos/play/wwdc2020/10026/), list appearances and configuration around 3:02–4:09.
 - **[A18]** Apple Developer, [WWDC20: List separator alignment](https://developer.apple.com/videos/play/wwdc2020/10026/?time=542), around 9:02–11:19.
-- **[I1]** Iconoir, [Official React documentation](https://iconoir.com/docs/packages/iconoir-react), including its 24×24 grid, standard SVG props, and default stroke treatment.
+- **[I1]** Hugeicons, [Official documentation](https://hugeicons.com/docs) and the installed `@hugeicons/react` README: renderer, free Stroke Rounded package, 24×24 grid, size/colour/stroke props and accessible SVG use.

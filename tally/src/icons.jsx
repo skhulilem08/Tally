@@ -1,40 +1,41 @@
-import {
-  NavArrowLeft as BackGlyph,
-  ArrowRight as ForwardGlyph,
-  OpenBook,
-  Check as CheckGlyph,
-  CheckCircle,
-  NavArrowRight,
-  HelpCircle,
-  Clock,
-  Cutlery,
-  HomeSimpleDoor,
-  TaskList,
-  RefreshCircle,
-  LogOut as LogOutGlyph,
-  ChatBubble,
-  MoreHoriz,
-  Plus as PlusGlyph,
-  Search as SearchGlyph,
-  SendDiagonal,
-  Settings as SettingsGlyph,
-  ShoppingBag,
-  Sparks,
-  SunLight,
-  HalfMoon,
-  Trash,
-  User,
-  Xmark,
-} from 'iconoir-react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import ArrowLeft01Icon from '@hugeicons/core-free-icons/ArrowLeft01Icon'
+import ArrowRight02Icon from '@hugeicons/core-free-icons/ArrowRight02Icon'
+import ArrowRight01Icon from '@hugeicons/core-free-icons/ArrowRight01Icon'
+import BookOpen01Icon from '@hugeicons/core-free-icons/BookOpen01Icon'
+import Tick02Icon from '@hugeicons/core-free-icons/Tick02Icon'
+import CheckmarkCircle02Icon from '@hugeicons/core-free-icons/CheckmarkCircle02Icon'
+import HelpCircleIcon from '@hugeicons/core-free-icons/HelpCircleIcon'
+import Clock01Icon from '@hugeicons/core-free-icons/Clock01Icon'
+import KitchenUtensilsIcon from '@hugeicons/core-free-icons/KitchenUtensilsIcon'
+import Home01Icon from '@hugeicons/core-free-icons/Home01Icon'
+import Task01Icon from '@hugeicons/core-free-icons/Task01Icon'
+import RefreshIcon from '@hugeicons/core-free-icons/RefreshIcon'
+import Logout01Icon from '@hugeicons/core-free-icons/Logout01Icon'
+import BubbleChatIcon from '@hugeicons/core-free-icons/BubbleChatIcon'
+import MoreHorizontalIcon from '@hugeicons/core-free-icons/MoreHorizontalIcon'
+import Add01Icon from '@hugeicons/core-free-icons/Add01Icon'
+import Search01Icon from '@hugeicons/core-free-icons/Search01Icon'
+import SentIcon from '@hugeicons/core-free-icons/SentIcon'
+import Settings02Icon from '@hugeicons/core-free-icons/Settings02Icon'
+import ShoppingBasket01Icon from '@hugeicons/core-free-icons/ShoppingBasket01Icon'
+import SparklesIcon from '@hugeicons/core-free-icons/SparklesIcon'
+import Sun01Icon from '@hugeicons/core-free-icons/Sun01Icon'
+import Moon02Icon from '@hugeicons/core-free-icons/Moon02Icon'
+import Delete02Icon from '@hugeicons/core-free-icons/Delete02Icon'
+import UserCircleIcon from '@hugeicons/core-free-icons/UserCircleIcon'
+import Cancel01Icon from '@hugeicons/core-free-icons/Cancel01Icon'
 
-// All interface icons share Iconoir's outline family. The adapter keeps
-// existing component size props consistent with Iconoir's SVG dimensions.
+// One shared Hugeicons Stroke Rounded family for every interface glyph.
+// Semantic aliases keep the screens independent of a library's naming scheme.
 function icon(Glyph) {
   function TallyIcon({ size = 24, strokeWidth = 1.5, ...props }) {
     const decorative = !props['aria-label'] && !props['aria-labelledby']
     return (
-      <Glyph
+      <HugeiconsIcon
         {...props}
+        icon={Glyph}
+        size={size}
         width={props.width ?? size}
         height={props.height ?? size}
         strokeWidth={strokeWidth}
@@ -47,29 +48,29 @@ function icon(Glyph) {
   return TallyIcon
 }
 
-export const ArrowLeft = icon(BackGlyph)
-export const ArrowRight = icon(ForwardGlyph)
-export const BookOpen = icon(OpenBook)
-export const Check = icon(CheckGlyph)
-export const CheckCircle2 = icon(CheckCircle)
-export const ChevronRight = icon(NavArrowRight)
-export const CircleHelp = icon(HelpCircle)
-export const Clock3 = icon(Clock)
-export const CookingPot = icon(Cutlery)
-export const House = icon(HomeSimpleDoor)
-export const ListChecks = icon(TaskList)
-export const LoaderCircle = icon(RefreshCircle)
-export const LogOut = icon(LogOutGlyph)
-export const MessageCircle = icon(ChatBubble)
-export const MoreHorizontal = icon(MoreHoriz)
-export const Plus = icon(PlusGlyph)
-export const Search = icon(SearchGlyph)
-export const Send = icon(SendDiagonal)
-export const Settings = icon(SettingsGlyph)
-export const ShoppingBasket = icon(ShoppingBag)
-export const Sparkles = icon(Sparks)
-export const Sun = icon(SunLight)
-export const Moon = icon(HalfMoon)
-export const Trash2 = icon(Trash)
-export const UserRound = icon(User)
-export const X = icon(Xmark)
+export const ArrowLeft = icon(ArrowLeft01Icon)
+export const ArrowRight = icon(ArrowRight02Icon)
+export const BookOpen = icon(BookOpen01Icon)
+export const Check = icon(Tick02Icon)
+export const CheckCircle2 = icon(CheckmarkCircle02Icon)
+export const ChevronRight = icon(ArrowRight01Icon)
+export const CircleHelp = icon(HelpCircleIcon)
+export const Clock3 = icon(Clock01Icon)
+export const CookingPot = icon(KitchenUtensilsIcon)
+export const House = icon(Home01Icon)
+export const ListChecks = icon(Task01Icon)
+export const LoaderCircle = icon(RefreshIcon)
+export const LogOut = icon(Logout01Icon)
+export const MessageCircle = icon(BubbleChatIcon)
+export const MoreHorizontal = icon(MoreHorizontalIcon)
+export const Plus = icon(Add01Icon)
+export const Search = icon(Search01Icon)
+export const Send = icon(SentIcon)
+export const Settings = icon(Settings02Icon)
+export const ShoppingBasket = icon(ShoppingBasket01Icon)
+export const Sparkles = icon(SparklesIcon)
+export const Sun = icon(Sun01Icon)
+export const Moon = icon(Moon02Icon)
+export const Trash2 = icon(Delete02Icon)
+export const UserRound = icon(UserCircleIcon)
+export const X = icon(Cancel01Icon)

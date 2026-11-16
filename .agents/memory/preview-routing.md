@@ -9,6 +9,12 @@ Verify Tally through the public development preview proxy after workflow or pack
 
 **How to apply:** Check the proxied root, a client-side deep link, and the API's expected signed-out response after the final restart. If the frontend works locally but Preview returns API HTML or a gateway error, inspect forwarding before restarting again. Check that any required mapping survived workflow management. A reachable development listener must not become a bare-API dead end when Preview selects it.
 
+A passing production build and HTTP 200 HTML are not sufficient after replacing frontend dependencies.
+
+**Why:** Vite retained an uninstalled icon library in its development optimizer and returned failed module responses for the replacement icons, leaving a blank page despite a successful production build.
+
+**How to apply:** Verify the actual rendered Preview and its module responses after dependency-family changes; distinguish optimizer/cache failures from forwarding failures before changing ports.
+
 Test guest-to-account isolation on the **same origin and browser context** throughout.
 
 **Why:** The supported Clerk test helper returned a public development-domain sign-in URL while the initial guest records were created on localhost. Comparing those separate storage origins falsely appeared to prove account isolation.

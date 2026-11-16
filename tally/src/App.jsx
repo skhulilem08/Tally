@@ -641,80 +641,104 @@ function GroceryPlanner({ kitchen, canUseKitchen, user }) {
 }
 
 function SettingsPage({ theme, setTheme, user, isSignedIn }) {
-  const displayName = user?.fullName || user?.primaryEmailAddress?.emailAddress || 'Your Tally account'
-  const [appearanceOpen, setAppearanceOpen] = useState(false)
-  const appearanceDialogRef = useRef(null)
-  const appearanceLabel = { system: 'System', light: 'Light', dark: 'Dark' }[theme] || 'System'
+  const displayName = user?.fullName || user?.primaryEmailAddress?.emailAddress || 'Account'
+  const appearanceOptions = [['system', 'System'], ['light', 'Light'], ['dark', 'Dark']]
+  const [activeSheet, setActiveSheet] = useState(null)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const [, setLocation] = useLocation()
+  const sheetRef = useRef(null)
+  const searchRef = useRef(null)
+  const goBack = () => {
+    if (window.history.length > 1) window.history.back()
+    else setLocation('/home')
+  }
   useEffect(() => {
-    const dialog = appearanceDialogRef.current
-    if (appearanceOpen && dialog && !dialog.open) dialog.showModal()
-  }, [appearanceOpen])
+    if (activeSheet && sheetRef.current && !sheetRef.current.open) sheetRef.current.showModal()
+  }, [activeSheet])
   useEffect(() => {
-    const dialog = appearanceDialogRef.current
-    if (!dialog) return
-    const close = () => setAppearanceOpen(false)
-    dialog.addEventListener('close', close)
-    return () => dialog.removeEventListener('close', close)
-  }, [])
+    if (searchOpen) searchRef.current?.focus()
+  }, [searchOpen])
+  const openSearch = () => {
+    if (searchOpen) {
+      setSearchOpen(false)
+      setQuery('')
+    } else setSearchOpen(true)
+  }
+  const accountValue = isSignedIn ? displayName : 'Guest'
+  const settingRows = [
+    {
+      key: 'account',
+      label: 'Account',
+      value: accountValue,
+      Icon: UserRound,
+      action: isSignedIn ? () => setLocation('/settings/account') : () => setLocation('/sign-in'),
+      testId: 'settings-account',
+    },
+    {
+      key: 'appearance',
+      label: 'Appearance',
+      value: { system: 'System', light: 'Light', dark: 'Dark' }[theme] || 'System',
+      Icon: Sun,
+      action: () => setActiveSheet('appearance'),
+      testId: 'settings-appearance',
+    },
+    {
+      key: 'privacy',
+      label: 'Privacy & service',
+      Icon: CircleHelp,
+      action: () => setActiveSheet('privacy'),
+      testId: 'settings-privacy',
+    },
+  ]
+  const visibleRows = settingRows.filter((row) => `${row.label} ${row.value || ''}`.toLowerCase().includes(query.trim().toLowerCase()))
   return <div className="page settings-page settings-native-page">
-    <header className="settings-native-header"><h1>Settings</h1></header>
-    <section className="settings-native-section" aria-labelledby="settings-account-label">
-      <h2 id="settings-account-label" className="settings-native-label">Account</h2>
-      <div className="settings-native-group">
-        {!isSignedIn && <div className="settings-native-row"><span className="settings-row-symbol"><UserRound size={20} /></span><span className="settings-native-copy"><strong>Guest</strong></span><span className="settings-row-value">On this device</span></div>}
-        {isSignedIn
-          ? <Link href="/settings/account" className="settings-native-row">
-              <span className="settings-avatar">{(user?.firstName || user?.primaryEmailAddress?.emailAddress || 'T').slice(0, 1).toUpperCase()}</span>
-              <span className="settings-native-copy"><strong>{displayName}</strong><small>{user?.primaryEmailAddress?.emailAddress}</small></span>
-              <ChevronRight size={19} className="settings-native-chevron" />
-            </Link>
-          : <Link href="/sign-in" className="settings-native-row">
-              <span className="settings-row-symbol"><UserRound size={20} /></span>
-              <span className="settings-native-copy"><strong>Sign in</strong></span>
-              <ChevronRight size={19} className="settings-native-chevron" />
-            </Link>}
-      </div>
-    </section>
-    <section className="settings-native-section" aria-labelledby="settings-appearance-label">
-      <h2 id="settings-appearance-label" className="settings-native-label">Preferences</h2>
-      <div className="settings-native-group">
-        <button type="button" className="settings-native-row settings-native-button" onClick={() => setAppearanceOpen(true)} aria-haspopup="dialog" aria-expanded={appearanceOpen} aria-controls="settings-appearance-dialog">
-          <span className="settings-row-symbol"><Sun size={20} /></span>
-          <span className="settings-native-copy"><strong>Appearance</strong></span>
-          <span className="settings-row-value">{appearanceLabel}</span>
-          <ChevronRight size={19} className="settings-native-chevron" />
-        </button>
-      </div>
-    </section>
-    <section className="settings-native-section" aria-labelledby="settings-about-label">
-      <h2 id="settings-about-label" className="settings-native-label">About</h2>
-      <div className="settings-native-group">
-        <details className="settings-disclosure">
-          <summary className="settings-native-row">
-            <span className="settings-row-symbol"><CircleHelp size={20} /></span>
-            <span className="settings-native-copy"><strong>Privacy &amp; service</strong></span>
-            <ChevronRight size={19} className="settings-native-chevron" />
-          </summary>
-          <div className="settings-disclosure-content">
-            <p>{isSignedIn ? 'Your cloud recipes and grocery lists are private to your signed-in account. Your guest kitchen stays separate on this device.' : 'Guest recipes and grocery lists are saved only in this browser. Clearing browser data removes them; they are not cloud backups.'}</p>
-            <p>Assistant messages are sent to Tally’s assistant service to prepare replies.</p>
-            <p>Recipe drafts are saved only after you approve them. AI chat requires sign-in. Voice and recipe media are not available in this version.</p>
-          </div>
-        </details>
-      </div>
-    </section>
-    <dialog ref={appearanceDialogRef} id="settings-appearance-dialog" className="settings-appearance-sheet" aria-labelledby="appearance-sheet-title" onClick={(event) => { if (event.target === event.currentTarget) event.currentTarget.close() }}>
+    <header className="settings-native-header">
+      <button type="button" className="settings-toolbar-button" onClick={goBack} aria-label="Go back" data-testid="settings-back"><ArrowLeft size={19} /></button>
+      <h1>Settings</h1>
+      <button type="button" className="settings-toolbar-button" onClick={openSearch} aria-label={searchOpen ? 'Close settings search' : 'Search settings'} aria-pressed={searchOpen} data-testid="settings-search-toggle">
+        {searchOpen ? <X size={18} /> : <Search size={19} />}
+      </button>
+    </header>
+    {searchOpen && <label className="settings-search">
+      <Search size={17} aria-hidden="true" />
+      <span className="sr-only">Search settings</span>
+      <input ref={searchRef} type="search" value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Escape') { setSearchOpen(false); setQuery('') } }} placeholder="Search settings" data-testid="settings-search-input" />
+      {query && <button type="button" onClick={() => { setQuery(''); searchRef.current?.focus() }} aria-label="Clear search"><X size={16} /></button>}
+    </label>}
+    <div className="settings-native-groups" aria-label="Settings">
+      {[['account'], ['appearance', 'privacy']].map((keys) => {
+        const rows = visibleRows.filter((row) => keys.includes(row.key))
+        return rows.length > 0 && <div className="settings-native-group" key={keys[0]}>
+          {rows.map(({ key, label, value, Icon, action, testId }) => <button key={key} type="button" className="settings-native-row" onClick={action} data-testid={testId}>
+            <span className="settings-row-symbol"><Icon size={17} strokeWidth={1.7} /></span>
+            <span className="settings-row-title">{label}</span>
+            {value && <span className="settings-row-value">{value}</span>}
+            <ChevronRight size={18} className="settings-native-chevron" />
+          </button>)}
+        </div>
+      })}
+      {!visibleRows.length && <p className="settings-search-empty">No settings found</p>}
+    </div>
+    <dialog ref={sheetRef} className="settings-native-sheet" aria-labelledby="settings-sheet-title" onClick={(event) => { if (event.target === event.currentTarget) event.currentTarget.close() }} onClose={() => setActiveSheet(null)}>
       <div className="settings-sheet-grabber" aria-hidden="true" />
-      <div className="settings-sheet-header">
-        <h2 id="appearance-sheet-title">Appearance</h2>
-        <button type="button" className="settings-sheet-done" onClick={() => appearanceDialogRef.current?.close()}>Done</button>
-      </div>
-      <div className="settings-native-group settings-choice-group" role="radiogroup" aria-label="Choose appearance">
-        {[['system', 'System'], ['light', 'Light'], ['dark', 'Dark']].map(([value, label]) => <label key={value} className="settings-choice-row">
-          <input type="radio" name="tally-appearance" value={value} checked={theme === value} onChange={() => { setTheme(value); appearanceDialogRef.current?.close() }} />
-          <span>{label}</span>{theme === value && <Check size={19} />}
-        </label>)}
-      </div>
+      <header className="settings-sheet-header">
+        <h2 id="settings-sheet-title">{activeSheet === 'appearance' ? 'Appearance' : 'Privacy & service'}</h2>
+        <button type="button" className="settings-sheet-close" onClick={() => sheetRef.current?.close()} aria-label="Close">Done</button>
+      </header>
+      {activeSheet === 'appearance'
+        ? <div className="settings-sheet-group" role="radiogroup" aria-label="Appearance">
+            {appearanceOptions.map(([value, label]) => <label className="settings-choice-row" key={value}>
+              <input type="radio" name="tally-appearance" value={value} checked={theme === value} onChange={() => setTheme(value)} data-testid={`appearance-${value}`} />
+              <span>{label}</span>{theme === value && <Check size={19} aria-hidden="true" />}
+            </label>)}
+          </div>
+        : <div className="settings-privacy-copy">
+            {!isSignedIn && <section><h3>Guest kitchen</h3><p>Recipes and lists stay in this browser on this device. Clearing browser data removes them; they are not a cloud backup.</p></section>}
+            {isSignedIn && <section><h3>Account</h3><p>Your cloud recipes and grocery lists are private to your signed-in account. The guest kitchen stays separate on this device.</p></section>}
+            <section><h3>Assistant</h3><p>Messages are sent to Tally’s assistant service to prepare replies. Chat requires sign-in.</p></section>
+            <section><h3>Your recipes</h3><p>Drafts are saved only after you approve them. Voice and recipe media aren’t available in this version.</p></section>
+          </div>}
     </dialog>
   </div>
 }

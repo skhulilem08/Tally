@@ -1,2 +1,2 @@
-- [Project requirements](project-requirements.md) — JavaScript/PWA, iOS feel led by HIG, solid colours/no Glass, Iconoir, five tabs, and device-only guest kitchens.
+- [Project requirements](project-requirements.md) — JavaScript/PWA, iOS feel led by HIG, solid colours/no Glass, Hugeicons, five tabs, and device-only guest kitchens.
 - [Preview routing](preview-routing.md) — Workflow management can regenerate legacy forwarding; validate the public preview proxy, not localhost alone.

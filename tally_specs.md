@@ -265,6 +265,23 @@ Blueprint example: 300g beef for 2 servings becomes 600g for 4; 200g usable on h
 - Export, account/data deletion, dietary/unit/language settings, notifications, and support/about are recommendations or future scope—not all mandatory first-release features.
 - Exact retention/deletion policy, optional sync/privacy controls, and login providers remain open.
 
+### Deferred local-first storage
+
+The user selected **IndexedDB with architect guidance**, then paused implementation to focus on the Settings design. The intended account-scoped local-first architecture, migration safeguards, conflict handling and required **Settings sync tracking** are recorded in [indexeddb_sync_plan.md](indexeddb_sync_plan.md). This is future work, not an enabled capability; do not add simulated sync status or actions to Settings.
+
+### Deferred SQL atomicity and race-condition review
+
+**User request — for later, not implementation now:** review operations and functions currently coordinated in JavaScript that should instead rely on SQL/database guarantees for atomicity and robustness. This records a review requirement, not a finding that every current operation is unsafe.
+
+- Identify database read–modify–write sequences, check-then-insert logic, related multi-record writes, approvals, duplicate prevention, deletions and future sync acknowledgements.
+- Move integrity-critical work into atomic SQL statements or correctly scoped PostgreSQL transactions. Apply unique/foreign-key/check constraints, conditional updates, row locks or appropriate isolation where the operation requires them.
+- Keep authorization account-scoped throughout the transaction. Couple successful data changes and idempotency receipts so concurrent requests or lost-response retries cannot duplicate or partially apply an operation.
+- Use version checks and deliberate conflict handling where concurrent edits must not overwrite one another silently.
+- Verify with concurrent requests, retries, interrupted responses and rollback/failure tests; moving code into SQL alone does not establish race safety.
+- Keep UI behaviour and suitable pure calculations in JavaScript. Browser-local IndexedDB work needs its own atomic transactions; it is not replaced by PostgreSQL.
+
+Review this alongside the deferred sync architecture before resuming backend/storage implementation. Do not change application code or the database merely to record this note.
+
 ## 10. Design specification
 
 Apply [ui_design_skill.md](ui_design_skill.md) as the detailed design implementation guide.
@@ -277,7 +294,7 @@ Apply [ui_design_skill.md](ui_design_skill.md) as the detailed design implementa
 - **Confirmed colour roles:** orange primary in light mode; gold replaces orange in dark mode; pink is tertiary; black and white form the secondary foundation.
 - Addendum starting shades: orange `#F97316`, gold `#E8B44B`, pink `#F3A6BF`. These are suggestions, not final approved shades or Apple system constants; validate actual contrast pairs.
 - iOS uses system typography/SF Pro through the system font stack and accessible scaling. “Jartaka” is provisionally interpreted as Plus Jakarta Sans; confirm the exact Google font family before implementation. Android's precise font mapping remains open.
-- Readable hierarchy, generous useful spacing, **Iconoir** interface icons chosen for iOS-like clarity, and restrained transitions. Use one shared outline family; Iconoir is not Apple SF Symbols. See the icon mapping and sizing/accessibility rules in `ui_design_skill.md`.
+- Readable hierarchy, generous useful spacing, **Hugeicons** interface icons chosen for iOS-like clarity, and restrained transitions. The user's latest Hugeicons instruction supersedes Iconoir; use one shared outline family, not Apple SF Symbols. See the mapping and sizing/accessibility rules in `ui_design_skill.md`.
 - Five visible labelled destinations in the confirmed order, prominent third/centre AI, safe-area padding.
 - Large tappable grocery rows and controls; visible focus, accessible names, colour-independent states.
 - Support 200% text enlargement, keyboard access, text alternatives to audio, and reduced motion.

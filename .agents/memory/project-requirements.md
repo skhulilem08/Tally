@@ -21,23 +21,47 @@ Keep routine interface copy concise; do not surround familiar controls with redu
 
 **How to apply:** Remove unnecessary taglines, repeated descriptions, and routine helper paragraphs. Retain essential field labels, quantities/units, error/recovery, privacy, and approval/destructive-action information.
 
+Use the supplied PocketBook Settings image as the Settings-specific visual target.
+
+**Why:** After rejecting earlier Settings work as not high-end iOS, the user supplied the light/dark Settings image and said, “This design and loook and feel for settings”.
+
+**How to apply:** Follow the image referenced in `ui_design_skill.md` for native grouping, compact toolbar and monochrome treatment; adapt the content to real Tally settings rather than adding finance-app controls.
+
+Preserve the approved Settings direction, with rounder corners and more solid whites and iOS-like colours.
+
+**Why:** The user responded “Nice” to the reference-based design, then requested increased border radius and more solid colours using HIG as reference.
+
+**How to apply:** Refine rather than replace the Settings layout. Keep opaque neutral light/dark surfaces and the no-glass constraint.
+
 Use Apple HIG as Tally's primary design reference, with solid-colour, iOS 7+ inspired design and no Liquid Glass.
 
 **Why:** The user stated, “Hig is our primary ref for design skills”, requested Apple design principles, clarified “7+”, and specified “solid color not Liquid Glass”. They also clarified that the attached images are part of the native look-and-feel reference and design guide.
 
 **How to apply:** Read the project-root `ui_design_skill.md` and `tally_specs.md` before further app implementation. Apple HIG leads design decisions within the user's explicit constraints; supplied images guide native visual interpretation, and NN/G is supporting UX research. MDN/W3C govern web semantics and accessibility. Apply this hierarchy consistently across implementation skills.
 
-Use Iconoir for Tally's interface icons, choosing glyphs close in character to iOS icons.
+Use Hugeicons for Tally's interface icons.
 
-**Why:** The user requested, “Use iconnoir for icons that are close to iOS icons”.
+**Why:** The user explicitly changed the earlier Iconoir choice: “Switch from iconoir to huge icons icons”.
 
-**How to apply:** Keep interface icons in one coherent Iconoir family across screens; preserve accessible names and sufficient touch targets. This is not a request to use Apple SF Symbols or replace custom brand artwork.
+**How to apply:** Keep interface icons in one coherent Hugeicons family across screens; preserve iOS-appropriate meanings, accessible names and sufficient touch targets. Do not reintroduce Iconoir or replace custom brand artwork as part of an interface-icon change.
 
 Allow guest access with recipes and grocery lists saved on this device.
 
 **Why:** The user requested guest access and selected “Save on this device (recommended)”, rather than browse-only access.
 
 **How to apply:** Preserve guest use without an account and keep its local records separate from signed-in cloud kitchens. Do not silently merge/upload guest records or erase them on sign-in/sign-out. Explain the absence of cloud backup without cluttering routine controls.
+
+Use IndexedDB for future local-first storage with architect guidance; include truthful sync tracking in Settings when that feature is implemented.
+
+**Why:** The user chose “IndexedDB ... with architect guidance” and asked for sync to be trackable in Settings, then explicitly deferred implementation to focus on Settings design.
+
+**How to apply:** Keep the decision and safety requirements in `indexeddb_sync_plan.md`. Do not resume the deferred implementation or add simulated sync controls during design-only work.
+
+Review JavaScript-coordinated database operations for SQL-enforced atomicity and race protection before future backend/storage work.
+
+**Why:** The user said some operations implemented in JavaScript should have been SQL to be atomic and robust, and explicitly asked to document this for later.
+
+**How to apply:** Follow the deferred review in `tally_specs.md`; assess transaction boundaries, constraints, concurrency and idempotency rather than assuming a JavaScript-to-SQL rewrite alone removes races. This is deferred work, not permission to implement it now.
 
 Use five bottom tabs in this order: Home, Cookbook, AI Assistant, Groceries, Settings. AI is third, centred, and most prominent; Settings does not need repeating in headers. Keep both recent-item shortcuts in AI.
 

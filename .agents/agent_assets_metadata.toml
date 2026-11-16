@@ -56,3 +56,31 @@ mtime_ms = 1794824094226
 storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:b3e557ab-bbf1-40f9-827c-283e8540fe4b/1c7f1a0f-b138-452e-bb15-d126b0cee8e8/8c6a2fc6-e04c-4333-8e36-37c5714ad7d5"
 storage_version_token = "1794824480903469"
 content_type = "image/png"
+
+[[outputs]]
+id = "ml1fBuBxwdr9OOxs3NNzr"
+uri = "file://.local/share/tally-preview/settings-hugeicons-light.png"
+type = "image"
+title = "Updated Settings — light"
+description = "Actual Preview capture with the supplied Settings styling and Hugeicons."
+logical_id = "e3d8fbe8-08fd-4807-8229-bdd5aa3cd984"
+content_hash = "sha256:5218c0ce30a75e81e3ea55452d714d9f412d3cc45459f0bae73c0254253ddad9"
+size = 23417
+mtime_ms = 1794826797939
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:b3e557ab-bbf1-40f9-827c-283e8540fe4b/e3d8fbe8-08fd-4807-8229-bdd5aa3cd984/dbdf7e90-3790-4b18-90f6-fc90e65766f4"
+storage_version_token = "1794826927660931"
+content_type = "image/png"
+
+[[outputs]]
+id = "r5FdH6Cn1gJNji3QvrYrm"
+uri = "file://.local/share/tally-preview/settings-hugeicons-dark.png"
+type = "image"
+title = "Updated Settings — dark"
+description = "Actual Preview capture with black surfaces, grouped rows, and Hugeicons."
+logical_id = "e0e8e23b-178f-4979-a766-735fdc3e0551"
+content_hash = "sha256:419292bfa79248ecbaa443fd78b8ed964fdf5c89bd0a193e7e2f3118daa11d1c"
+size = 23918
+mtime_ms = 1794826856103
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:b3e557ab-bbf1-40f9-827c-283e8540fe4b/e0e8e23b-178f-4979-a766-735fdc3e0551/9780ef19-e418-4ac6-a135-f517d7e944ab"
+storage_version_token = "1794826928108894"
+content_type = "image/png"
