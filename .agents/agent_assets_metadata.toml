@@ -1,0 +1,30 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "Ge8thbtVPVZFCPcI7ANgx"
+uri = "file://ui_design_skill.md"
+type = "text"
+title = "Tally UI Design Guide"
+description = "Architect-reviewed iOS 7+ solid-colour design guidance with NN/G, Apple, and accessibility sources. No Liquid Glass."
+logical_id = "2611c3f0-6375-440e-a7c7-294ac838bd9d"
+content_hash = "sha256:6477ce16cd981fda6f446cdc33e78c7a64e379f69d99fa00d2e54de2a54d9eec"
+size = 17376
+mtime_ms = 1794819097954
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:b3e557ab-bbf1-40f9-827c-283e8540fe4b/2611c3f0-6375-440e-a7c7-294ac838bd9d/450586ad-37d5-4b10-be4b-af0d76cfa1f8"
+storage_version_token = "1794819122352592"
+content_type = "text/markdown"
+
+[[outputs]]
+id = "TvIM6fZBoKcohpUpd46oe"
+uri = "file://tally_specs.md"
+type = "text"
+title = "Tally Product Specification"
+description = "Requirements consolidated from your PDF and images, including confirmed scope, user journeys, and open decisions."
+logical_id = "13929c44-a10a-4688-bfdb-ed4522976b3d"
+content_hash = "sha256:4f1d84be937dac6d973bce8e5ed92b8b387c0e4f4964afd2a7d199089bbbcafb"
+size = 22068
+mtime_ms = 1794819099557
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:b3e557ab-bbf1-40f9-827c-283e8540fe4b/13929c44-a10a-4688-bfdb-ed4522976b3d/da4d6761-b9e4-42be-a784-0b781367645f"
+storage_version_token = "1794819122821466"
+content_type = "text/markdown"
