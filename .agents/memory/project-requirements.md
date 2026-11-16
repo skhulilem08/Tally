@@ -9,11 +9,11 @@ Use JavaScript, not TypeScript, for Tally.
 
 **How to apply:** Use `.js` and `.jsx` for application source and configuration.
 
-The kitchen app should be a PWA with a native-style interface, not an Expo app.
+Tally is delivered as a PWA, but it must never look or feel like a PWA; it must look and feel native.
 
-**Why:** The user clarified, “PWA but native interface or design”.
+**Why:** The user clarified “PWA but native interface or design”, then emphasised: “it must never ever look or feel like a pwa but must and I mean must look and feel native”.
 
-**How to apply:** Preserve the web platform when developing the kitchen app.
+**How to apply:** Preserve the web platform and JavaScript requirement, but treat native appearance and interaction as a strict acceptance gate, not an optional styling preference. Apply it to supporting screens and real-phone behaviour, not screenshots alone.
 
 Use solid-colour, iOS 7+ inspired design for Tally, not Liquid Glass.
 

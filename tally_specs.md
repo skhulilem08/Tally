@@ -42,12 +42,22 @@ The cookbook and grocery history must remain useful without an active AI convers
 - Grocery arithmetic is deterministic and only combines compatible ingredients and units.
 - A grocery check means “placed in cart”, not “purchased” or “restocked”.
 
+### Strict native-experience requirement
+
+**Confirmed and non-negotiable:** the user states that Tally “must never ever look or feel like a pwa” and “must look and feel native”.
+
+The PWA is the delivery mechanism only; the product experience must be native in appearance and interaction. A responsive website or a desktop dashboard adapted to a narrow viewport does not meet acceptance criteria.
+
+This applies to every main and supporting screen: navigation/back behaviour, state preservation, touch feedback, transitions, scrolling, text entry, keyboard handling, safe areas, sheets/dialogs, loading, errors, and installed launch. Follow the concrete native-experience release gate in `ui_design_skill.md`.
+
+Browser-controlled UI and native-only capability restrictions must be disclosed honestly. They do not relax the requirement for everything inside Tally, and they must not be disguised with fake functionality.
+
 ## 3. Platform and technology
 
 | Area | Requirement / status |
 | --- | --- |
 | Name | **Confirmed:** Tally. “AI Kitchen” was a placeholder. |
-| App form | **Confirmed:** installable web/PWA with a native-style interface. |
+| App form | **Confirmed:** PWA delivery; strictly native appearance and behaviour, not merely a native-styled website. |
 | Frontend | **Confirmed:** Vite + React, JavaScript/JSX. |
 | Language constraint | **Confirmed:** no TypeScript application source or TypeScript migration. |
 | Visual material | **Confirmed:** solid colours/opaque surfaces; no Liquid Glass. |
@@ -296,6 +306,10 @@ The user requested architect consultation and the two specification files before
 
 ## 14. Core acceptance criteria
 
+- [ ] Tally looks **and feels native** throughout the real-phone journey; a website-like result blocks acceptance.
+- [ ] Routine navigation avoids full-document reloads and preserves tab/back state, scroll, and draft input.
+- [ ] Touch feedback, scrolling, transitions, keyboard, safe areas, and sheets work coherently without hover dependence or layout jumps.
+- [ ] Installed launch is standalone, with no app-created browser chrome or website-style page structure.
 - [ ] Register/sign in works, and two accounts cannot read/write each other's records or media.
 - [ ] Exactly three labelled bottom destinations; AI centred and emphasised.
 - [ ] Settings and recent shortcuts follow the agreed navigation arrangement; attachment conflicts are not silently reinterpreted.

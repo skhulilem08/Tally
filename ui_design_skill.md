@@ -15,6 +15,24 @@ Design a personal kitchen companion that feels refined, calm, premium, and easy 
 
 This is a **React + Vite PWA implemented in JavaScript/JSX**, not an Expo app or a TypeScript project. The user's visual reference is **iOS 7+ design principles, with solid colours and no Liquid Glass**. Make it feel native through familiar navigation, responsive controls, clear hierarchy, and reliable behaviour—not through browser-disguising effects.
 
+### Native experience is a release gate
+
+The user's strict requirement: **“it must never ever look or feel like a pwa but must and I mean must look and feel native”.**
+
+PWA describes the delivery technology only. A merely mobile-friendly website, responsive dashboard, or app-shaped webpage fails this requirement. Native appearance **and behaviour** must be assessed together on the target phone.
+
+- Use app screens, native-convention navigation/back stacks, solid sheets, grouped controls, and contextual actions—not website headers, marketing sections, footers, or desktop menus squeezed onto a phone.
+- Routine navigation must not reload the whole document. Preserve screen state, scroll position, draft input, and selection rather than remounting a blank/loading page on every tab change.
+- Touch controls need immediate pressed/selected feedback. No core task may depend on hover; avoid accidental double activation and delayed-looking interactions.
+- Keep transitions restrained, coherent, and spatially understandable. No glass effects, decorative page entrances, or layout jumps. Respect reduced motion.
+- Handle the software keyboard, focus, text entry, safe areas, scrolling, sheets, and dismissal as app interactions. Keep the composer and primary actions reachable.
+- Use familiar platform conventions for Back, Cancel, Done, pickers, toggles, and confirmation. Browser-default alerts or prompts are not the app's routine interaction design.
+- The installed experience should open standalone with correct icons, launch colours, and no app-created browser-like chrome. Do not put “PWA” branding or technical installation language into everyday product screens.
+- Do not fake native features. Unavailable OS capabilities require an honest, well-designed alternative, not an inert control or misleading animation.
+- Before accepting a screen, ask: **Does it look and respond like a native app during the actual task, not just in a screenshot?** If not, revise it.
+
+Browser-owned permission prompts, browser chrome when opened in a browser, installation UI, and OS/browser capability limits are outside full app control. Document those boundaries honestly; do not use them to excuse website-like design inside Tally. Do not promise indistinguishability from every native app or automatic access to native-only APIs.
+
 Apply requirements in this order:
 
 1. The user's latest explicit instructions.
@@ -196,6 +214,10 @@ Checking groceries means **in the cart**, not purchased, consumed, or added to p
 
 ### Design acceptance checklist
 
+- [ ] Native appearance **and interaction** pass real-phone review; “responsive website” is not an acceptable substitute.
+- [ ] Routine navigation has no document reloads; tab/back navigation preserves relevant state.
+- [ ] Press feedback, scrolling, transitions, keyboard, and sheets behave like an app without layout jumps or hover dependence.
+- [ ] Installed launch is standalone; no website-style headers/footers or app-created browser chrome.
 - [ ] Solid surfaces; no glass, backdrop blur, or translucent navigation.
 - [ ] Orange light mode and gold dark mode; tested labels, icons, and control boundaries.
 - [ ] Three labelled tabs; AI centred; tab selection never starts recording.
