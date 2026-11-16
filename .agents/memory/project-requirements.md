@@ -17,9 +17,9 @@ Tally is delivered as a PWA, but it must never look or feel like a PWA; it must 
 
 Use solid-colour, iOS 7+ inspired design for Tally, not Liquid Glass.
 
-**Why:** The user explicitly requested Apple design principles, clarified “7+”, and specified “solid color not Liquid Glass”.
+**Why:** The user explicitly requested Apple design principles, clarified “7+”, and specified “solid color not Liquid Glass”. They also clarified that the attached images are part of the native look-and-feel reference and design guide.
 
-**How to apply:** Read the project-root `ui_design_skill.md` and `tally_specs.md` before further app implementation. They distinguish the user's requirements from researched recommendations and attachment conflicts.
+**How to apply:** Read the project-root `ui_design_skill.md` and `tally_specs.md` before further app implementation. Apply the supplied images to screen composition, hierarchy, grouped surfaces, spacing, and controls—not just food photography—while preserving confirmed navigation, palette, and no-glass constraints.
 
 Use five bottom tabs in this order: Home, Cookbook, AI Assistant, Groceries, Settings. AI is third, centred, and most prominent; Settings does not need repeating in headers. Keep both recent-item shortcuts in AI.
 

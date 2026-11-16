@@ -40,10 +40,22 @@ Apply requirements in this order:
 1. The user's latest explicit instructions.
 2. Confirmed product requirements in `tally_specs.md`.
 3. This document's accessibility and interaction rules.
-4. Attached reference imagery as visual inspiration.
+4. Supplied images as native look-and-feel design references, applied within the confirmed product, colour, material, and accessibility constraints.
 5. Proposed defaults, which remain adjustable.
 
 The architect reviewed the product constraints and the verified research before this guide was written. This is a project guide, not a claim of Apple endorsement or a globally installed Agent skill.
+
+### Supplied images are part of this design guide
+
+The user clarified that the attached images are references for **native look and feel**, not merely food imagery. Use them as visual evidence during both implementation and review:
+
+- `attached_assets/IMG_1974_1794818558868.webp`: study the native screen composition, clear typographic hierarchy, solid grouped surfaces, rounded control treatment, bottom-navigation emphasis, and purposeful placement of food photography.
+- `attached_assets/IMG_1975_1794818558868.webp`: study the grouped detail information, spacing, touch-control geometry, uncluttered screen structure, and prominent primary interaction.
+- `attached_assets/IMG_1978_1794818558866.png`: retain the colour-role and platform-typography direction, subject to the newer addendum and the user's explicit stack choices.
+
+Translate those qualities into Tally's Home, cookbook, recipe details, assistant, groceries, Settings, and supporting screens. Do not substitute a generic website layout and claim that adding food photography matches the references. No exact pixel-for-pixel reproduction is required.
+
+Where an image conflicts with confirmed requirements, retain the five-tab structure, orange/gold/pink roles, accessible contrast, and opaque no-glass surfaces. Do not copy gradients, scanning, nutritional charts, or extra product features. Static images establish a visual target; native touch, navigation, transitions, and keyboard behaviour still need separate verification.
 
 ## 2. Research basis and historical boundary
 
@@ -227,6 +239,7 @@ Checking groceries means **in the cart**, not purchased, consumed, or added to p
 ### Design acceptance checklist
 
 - [ ] Native appearance **and interaction** pass real-phone review; “responsive website” is not an acceptable substitute.
+- [ ] Actual screens were compared against the supplied images for composition, hierarchy, grouping, controls, and spacing—not just food photography.
 - [ ] Routine navigation has no document reloads; tab/back navigation preserves relevant state.
 - [ ] Press feedback, scrolling, transitions, keyboard, and sheets behave like an app without layout jumps or hover dependence.
 - [ ] Installed launch is standalone; no website-style headers/footers or app-created browser chrome.

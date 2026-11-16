@@ -11,12 +11,14 @@ This specification combines:
 1. The user's direct instructions: app name **Tally**; React + Vite **JavaScript, not TypeScript**; **PWA with a native interface/design**; consult an architect before proceeding; research UX/UI and Apple **iOS 7+ design principles**; use **solid colours, not Liquid Glass**.
 2. `attached_assets/AI_Kitchen_App_Project_Blueprint_1794818578896.pdf`, *AI Kitchen — Product & Development Blueprint*, version 1.0, 15 November 2026, seven pages.
 3. `attached_assets/IMG_1978_1794818558866.png`, colour, typography, navigation, and native-implementation reference.
-4. `attached_assets/IMG_1974_1794818558868.webp`, food photography and mobile layout reference.
-5. `attached_assets/IMG_1975_1794818558868.webp`, recipe/food composition and mobile surface reference.
+4. `attached_assets/IMG_1974_1794818558868.webp`, native-app visual reference for screen composition, hierarchy, solid surfaces, control styling, navigation treatment, and food photography.
+5. `attached_assets/IMG_1975_1794818558868.webp`, native-app visual reference for grouped information, rounded surfaces, touch controls, spacing, and food-led detail screens.
 6. Verified Nielsen Norman Group and Apple Developer guidance, reviewed with the architect and cited in `ui_design_skill.md`.
 7. `attached_assets/AI_Kitchen_Native_App_Design_Update_v1_1_1794819465733.pdf`, *Specification Addendum 01 — Native-first app, five-tab navigation*, 15 November 2026, three pages. This update supersedes the original navigation and resolves the related screenshot conflicts.
 
 The user's direct clarifications override recommendations in the attachments. For product/design changes, the new addendum supersedes the original blueprint where they differ. Its native-framework recommendation does not override the user's explicit JavaScript/PWA stack choice. Reference imagery does not automatically add product features. Recommendations and open decisions below are deliberately distinct from confirmed scope.
+
+**User clarification:** the supplied images are part of the **native look-and-feel reference and the design guide**, not merely examples of food photography. Use them when designing and reviewing actual Tally screens. A generic interface that ignores their visual direction does not satisfy that intent; exact pixel-for-pixel copying is not required.
 
 ### Requirement labels
 
@@ -274,9 +276,11 @@ Apply [ui_design_skill.md](ui_design_skill.md) as the detailed design implementa
 - Include empty, loading, no-results, offline, denied-permission, upload, failure/retry, draft, and saved states.
 - UI content must accurately reflect storage, recording, and sync state.
 
-### What the food references do not specify
+### How to use the supplied image references
 
-The earlier food images show calorie tracking, nutritional percentages, scanning, and public/trending recipes. These are **not** Tally requirements. Borrow their visual quality and food imagery treatment, not unrequested features. Navigation comes from the new five-tab addendum, not incidental tabs in inspiration images.
+The images establish a native visual target: screen-level composition rather than webpage sections, strong readable hierarchy, solid grouped surfaces, restrained rounded geometry, deliberate spacing, compact app controls, prominent central interaction, and thoughtful food imagery where appropriate. Apply these qualities to Tally's real screens and supporting flows, not just decorative pictures.
+
+The images cannot demonstrate motion, keyboard behaviour, or touch responsiveness; those must independently satisfy the native interaction requirements. Their calorie tracking, nutritional percentages, scanning, and public/trending recipes are **not** added to Tally's scope. The five-tab addendum and the user's orange/gold/pink, solid-colour, no–Liquid Glass directions override conflicting navigation, colours, gradients, or materials in individual reference images.
 
 ## 11. Proposed logical data model
 
