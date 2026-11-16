@@ -14,12 +14,13 @@ This specification combines:
 4. `attached_assets/IMG_1974_1794818558868.webp`, food photography and mobile layout reference.
 5. `attached_assets/IMG_1975_1794818558868.webp`, recipe/food composition and mobile surface reference.
 6. Verified Nielsen Norman Group and Apple Developer guidance, reviewed with the architect and cited in `ui_design_skill.md`.
+7. `attached_assets/AI_Kitchen_Native_App_Design_Update_v1_1_1794819465733.pdf`, *Specification Addendum 01 — Native-first app, five-tab navigation*, 15 November 2026, three pages. This update supersedes the original navigation and resolves the related screenshot conflicts.
 
-The user's direct clarifications override older recommendations in the attachments. Reference imagery does not automatically add product features. Recommendations and open decisions below are deliberately distinct from confirmed scope.
+The user's direct clarifications override recommendations in the attachments. For product/design changes, the new addendum supersedes the original blueprint where they differ. Its native-framework recommendation does not override the user's explicit JavaScript/PWA stack choice. Reference imagery does not automatically add product features. Recommendations and open decisions below are deliberately distinct from confirmed scope.
 
 ### Requirement labels
 
-- **Confirmed:** directly stated in the blueprint's confirmed requirements or by the user.
+- **Confirmed:** directly stated in the blueprint/addendum's confirmed requirements or by the user.
 - **Design direction:** supplied by the user/reference images; exact visual implementation remains adjustable.
 - **Recommended:** proposed in the blueprint or by the architect; not silently promoted to confirmed scope.
 - **Open:** leave flexible until the user decides or a specific implementation needs clarification.
@@ -64,41 +65,59 @@ Browser-controlled UI and native-only capability restrictions must be disclosed 
 | API | **Recommended:** Node.js + Express, server-side validation and authorisation. |
 | Structured storage | **Recommended:** PostgreSQL, account-scoped records. |
 | Media | **Recommended:** private object storage, owner-authorised upload/read access. |
-| Authentication | Accounts are **confirmed**; Clerk has been provisioned as an implementation choice, but account UI/integration is not yet complete. Exact login methods remain open. |
-| AI | Replit OpenAI access has been provisioned as an implementation choice; conversation and voice features are not yet integrated. |
+| Authentication | Accounts are **confirmed**; the first development build includes branded Clerk sign-in/sign-up, account/sign-out screens, and session-scoped API ownership. Login-provider configuration remains adjustable. |
+| AI | The first development build integrates OpenAI text conversation and structured recipe drafts with separate approval. Voice is not yet implemented. |
 | Object storage | Provisioned infrastructure is not evidence of working media uploads. |
 
-The screenshot's React Native/Expo/TypeScript recommendation is superseded by the user's PWA and JavaScript instructions.
+React Native/Expo/TypeScript appears as a recommendation in the screenshot and addendum, not a confirmed stack. The user's PWA and JavaScript instructions remain authoritative. Native look and feel remains mandatory across every screen, including Home.
 
 PWA installation must use a valid manifest, suitable icons, secure hosting, and browser-appropriate installation guidance. Define caching deliberately; installation does not imply offline AI, automatic background recording, or full offline sync.
 
 ## 4. Navigation and information architecture
 
-Working navigation follows the blueprint and the arrangement previously communicated in this conversation:
+**Confirmed by the new addendum:** replace the original three-tab arrangement with five bottom tabs, in this exact order:
 
 | Destination | Position | Purpose |
 | --- | --- | --- |
-| Cookbook | Left bottom tab | Search and browse personal saved recipes. |
-| AI Assistant | Centre bottom tab, strongest emphasis | Conversational recipe capture and grocery planning. |
-| Groceries | Right bottom tab | Current/latest approved list and dated history. |
-| Account & Settings | Secondary destination | Account identity and relevant preferences; not a fourth bottom tab. |
+| Home | First tab | Premium native-feeling kitchen home screen; exact modules remain proposed. |
+| Cookbook | Second tab | Search and browse personal saved recipes. |
+| AI Assistant | Third tab, centred, strongest emphasis | Conversational recipe capture and grocery planning. |
+| Groceries | Fourth tab | Current/latest approved list and dated history. |
+| Settings | Fifth tab | Account access and relevant preferences; profile/account details are nested screens. |
 
-- Exactly three visible bottom destinations.
-- Settings entry at the consistent upper-right position on the three main screens, per the blueprint.
-- AI screen has recent-recipe and recent-grocery-list shortcuts, plus Settings.
-- Recipe details, list details, sign-in/up, and editing/review flows are secondary screens.
-- The fifth imagined top-level page remains **open**. Do not invent one.
+- Exactly five visible bottom destinations: **Home | Cookbook | AI Assistant | Groceries | Settings**.
+- AI remains centred because it is the third of five tabs.
+- Settings is accessible from its tab; it no longer needs to be repeated in the main-page headers.
+- AI screen retains direct shortcuts to the most recently saved recipe and grocery list.
+- Recipe details, individual grocery lists, profile/account settings, sign-in/register, and editing/review flows are nested screens, not extra bottom tabs.
+- Open details from their parent tab or an AI shortcut and preserve a coherent return path.
 - Tab selection only navigates. Selecting AI must never start microphone recording.
 - Preserve destination state and provide accessible labels and back navigation.
 
-### Attachment conflicts requiring explicit acknowledgement
+### Changes and resolved attachment conflicts
 
-| Conflict | Working interpretation |
+| Earlier requirement or recommendation | Current requirement |
 | --- | --- |
-| PNG says AI “stays third”; PDF says centre. | Retain the blueprint's centred AI arrangement already communicated; record the conflict, not a new approval. |
-| PNG says Settings need not appear in every header; PDF requires upper-right Settings on all three. | Use the PDF arrangement as the working basis; final change remains open. |
-| PNG recommends Expo/TypeScript. | Direct user clarification settles this: PWA + JavaScript. |
-| PDF leaves name/app form/colours open. | Name and app form are settled; orange/gold theme families are the supplied design direction; exact palette remains proposed. |
+| Original three bottom tabs and unspecified fifth page. | Superseded: five named tabs, including dedicated Home and Settings. |
+| PNG says AI “stays third”; original PDF says centre. | Resolved: third and centred in the five-tab bar. |
+| Original PDF requires upper-right Settings on three pages. | Superseded: Settings is the fifth tab; repeated header shortcut is not required. |
+| Screenshot/addendum recommends Expo/TypeScript. | Recommendation only; keep the explicitly chosen PWA + JavaScript stack. |
+| Addendum lists possible names as unselected. | The user already chose Tally; do not reopen the name or use a suggested alternative. |
+| Earlier documents leave colour families open. | Addendum confirms light orange, dark gold replacing orange, tertiary pink, and black/white secondary foundation. Exact shades remain adjustable. |
+
+### Home screen
+
+**Confirmed:** a dedicated Home tab that looks and behaves like a premium native app's home screen. It is not a website landing page or busy dashboard.
+
+**Proposed modules, not yet approved as final Home content:**
+
+- **Welcome header:** short personal greeting and uncluttered identity.
+- **Continue cooking:** one-tap return to the latest recipe's details; no invented cooking-progress tracking.
+- **Latest grocery list:** reopen the current list without searching history.
+- **Talk to your AI:** navigate to a conversation, with voice starting only after an explicit microphone action.
+- **Quick kitchen overview:** optional summaries based on real saved activity; never fabricate inventory quantities.
+
+The addendum's Home wireframe is illustrative, not final UI. If a proposed module is adopted, supply honest no-recipe/no-list states rather than sample personal activity presented as real.
 
 ## 5. Cookbook
 
@@ -245,11 +264,11 @@ Blueprint example: 300g beef for 2 servings becomes 600g for 4; 200g usable on h
 Apply [ui_design_skill.md](ui_design_skill.md) as the detailed design implementation guide.
 
 - iOS 7+ inspired visual principles with solid, opaque surfaces and navigation; no Liquid Glass, frosted blur, translucent panels, or primary gradients.
-- Orange primary in light mode, gold primary in dark mode; pink support.
-- Exact hex tokens are proposed custom Tally colours, not Apple system constants.
-- System font on iOS; Plus Jakarta Sans Android direction with reliable fallback.
+- **Confirmed colour roles:** orange primary in light mode; gold replaces orange in dark mode; pink is tertiary; black and white form the secondary foundation.
+- Addendum starting shades: orange `#F97316`, gold `#E8B44B`, pink `#F3A6BF`. These are suggestions, not final approved shades or Apple system constants; validate actual contrast pairs.
+- iOS uses system typography/SF Pro through the system font stack and accessible scaling. “Jartaka” is provisionally interpreted as Plus Jakarta Sans; confirm the exact Google font family before implementation. Android's precise font mapping remains open.
 - Readable hierarchy, generous useful spacing, consistent iconography, restrained transitions.
-- Three visible labelled destinations, prominent centre AI, safe-area padding.
+- Five visible labelled destinations in the confirmed order, prominent third/centre AI, safe-area padding.
 - Large tappable grocery rows and controls; visible focus, accessible names, colour-independent states.
 - Support 200% text enlargement, keyboard access, text alternatives to audio, and reduced motion.
 - Include empty, loading, no-results, offline, denied-permission, upload, failure/retry, draft, and saved states.
@@ -257,7 +276,7 @@ Apply [ui_design_skill.md](ui_design_skill.md) as the detailed design implementa
 
 ### What the food references do not specify
 
-The images show calorie tracking, nutritional percentages, scanning, public/trending recipes, and additional navigation. These are **not** Tally requirements. Borrow visual quality and food imagery treatment, not unrequested features or extra tabs.
+The earlier food images show calorie tracking, nutritional percentages, scanning, and public/trending recipes. These are **not** Tally requirements. Borrow their visual quality and food imagery treatment, not unrequested features. Navigation comes from the new five-tab addendum, not incidental tabs in inspiration images.
 
 ## 11. Proposed logical data model
 
@@ -294,7 +313,7 @@ The model must preserve draft-versus-approved boundaries. Draft persistence and 
 
 This is the blueprint's recommended sequence, not a statement that the steps are complete:
 
-1. **Foundation:** JavaScript app, approved design guidance, native-style three-tab shell, secondary screens, honest states, authentication and server access control.
+1. **Foundation:** JavaScript app, approved design guidance, strictly native-feeling five-tab shell including Home and Settings, nested screens, honest states, authentication and server access control.
 2. **Cookbook:** fixed recipe format, manual fallback, search/details, persistence, ownership, media.
 3. **Assistant:** structured text conversation, review/revision/approval; then voice and multilingual verification.
 4. **Grocery intelligence:** inventory report, explicit shopping scope/servings, deterministic shortages, approved lists/history.
@@ -302,7 +321,9 @@ This is the blueprint's recommended sequence, not a statement that the steps are
 
 The first useful end-to-end milestone remains: **sign in → create/review/approve a recipe → find it in Cookbook → reopen after refresh**.
 
-The user requested architect consultation and the two specification files before implementation continues. Research/document completion is separate from app-feature completion.
+The requested architect consultation and specification updates preceded implementation. The first development build now includes the five-tab shell, account-scoped recipe storage, manual recipe editing/search, text AI drafts with explicit approval, deterministic grocery previews/approval, dated lists and persistent item checks, and device theme preferences. Home uses a restrained working selection of the proposed greeting/latest-item/assistant modules, not fabricated activity.
+
+This is not the full release: voice conversations, recipe photo/video uploads, full offline editing/sync, final typography/branding decisions, and installed real-device acceptance remain outstanding. A passing build or browser test does not by itself satisfy the strict native-feel release gate.
 
 ## 14. Core acceptance criteria
 
@@ -311,8 +332,10 @@ The user requested architect consultation and the two specification files before
 - [ ] Touch feedback, scrolling, transitions, keyboard, safe areas, and sheets work coherently without hover dependence or layout jumps.
 - [ ] Installed launch is standalone, with no app-created browser chrome or website-style page structure.
 - [ ] Register/sign in works, and two accounts cannot read/write each other's records or media.
-- [ ] Exactly three labelled bottom destinations; AI centred and emphasised.
-- [ ] Settings and recent shortcuts follow the agreed navigation arrangement; attachment conflicts are not silently reinterpreted.
+- [ ] Exactly five labelled bottom destinations, ordered Home, Cookbook, AI Assistant, Groceries, Settings; third/centre AI is most prominent.
+- [ ] Home is a native-feeling app screen, not a landing page; proposed widgets are not treated as approved or populated with fabricated activity.
+- [ ] Settings opens from the fifth tab without requiring duplicate header shortcuts.
+- [ ] AI retains recent-recipe and recent-list shortcuts; recipe/list/profile/auth screens remain nested.
 - [ ] A casual recipe description becomes a readable fixed-format draft.
 - [ ] The person can correct/revise the draft and explicitly approve.
 - [ ] Unapproved drafts never appear as saved recipes or approved grocery lists.
@@ -324,16 +347,16 @@ The user requested architect consultation and the two specification files before
 - [ ] Check/uncheck state persists on the correct list after reload.
 - [ ] Older lists remain independent and accessible.
 - [ ] Recent shortcuts open the actual latest saved records or clear empty states.
-- [ ] Solid-colour light/dark design meets tested contrast and accessibility requirements.
+- [ ] Solid-colour light/dark design follows orange/gold primary, tertiary pink, and black/white foundation, with tested contrast.
 - [ ] Installable PWA behaviour is verified on supported browsers.
 - [ ] The critical journey works on a real phone; microphone denial has a usable text alternative.
 - [ ] Product copy distinguishes implemented features, pending work, drafts, and actual saved/synced data.
 
 ## 15. Decisions that remain open
 
-- Logo and final exact colour/font details.
-- Final resolution of the PNG/PDF AI-order and Settings-header conflicts.
-- Fifth top-level page, if any.
+- Logo/icon and name availability checks, without reopening the user's selected name Tally.
+- Final exact light/dark shades, exact Google font family, and Android font mapping.
+- Which proposed Home modules to include and their final content/layout.
 - Whole-cookbook versus selected-meal default; any weekly planning feature.
 - Exact recipe required fields and media placement.
 - Launch languages, voice character, interruption/latency expectations.
@@ -341,7 +364,7 @@ The user requested architect consultation and the two specification files before
 - Login methods, retention/privacy policy, export and cross-device/offline sync details.
 - Categories, favourites, budgeting, store modes, notifications, and purchase reconciliation.
 
-Do not fabricate these decisions or add features solely to fill an empty navigation position.
+Do not fabricate these decisions. Home and Settings are now confirmed top-level destinations; the previous unspecified-fifth-page question and AI-order/Settings-header conflicts are resolved by the addendum.
 
 ## 16. External design references
 

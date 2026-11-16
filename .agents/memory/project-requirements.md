@@ -20,3 +20,9 @@ Use solid-colour, iOS 7+ inspired design for Tally, not Liquid Glass.
 **Why:** The user explicitly requested Apple design principles, clarified “7+”, and specified “solid color not Liquid Glass”.
 
 **How to apply:** Read the project-root `ui_design_skill.md` and `tally_specs.md` before further app implementation. They distinguish the user's requirements from researched recommendations and attachment conflicts.
+
+Use five bottom tabs in this order: Home, Cookbook, AI Assistant, Groceries, Settings. AI is third, centred, and most prominent; Settings does not need repeating in headers. Keep both recent-item shortcuts in AI.
+
+**Why:** The user supplied a design addendum to update the Markdown specifications; it explicitly supersedes the original three-tab navigation.
+
+**How to apply:** Treat the old three-tab layout and unspecified fifth page as superseded. Home is confirmed, but its module selection remains proposed. The addendum's Expo/TypeScript recommendation and unselected name ideas do not override the user's JavaScript/PWA and Tally choices.

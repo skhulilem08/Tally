@@ -9,6 +9,8 @@ Research date: 16 November 2026
 Status: Research-informed implementation guidance; not evidence that the interface is implemented.  
 Companion: [Tally product specification](tally_specs.md).
 
+Product update: incorporates *Specification Addendum 01 — Native-first app, five-tab navigation* from `attached_assets/AI_Kitchen_Native_App_Design_Update_v1_1_1794819465733.pdf`. It supersedes earlier three-tab/header-Settings guidance. The user's JavaScript/PWA, strict native experience, and no–Liquid Glass instructions remain unchanged.
+
 ## 1. Purpose and authority
 
 Design a personal kitchen companion that feels refined, calm, premium, and easy to use while cooking or shopping. The person's recipes and current task are more important than decorative interface elements.
@@ -56,7 +58,7 @@ Use these researched principles:
 | User control and freedom | Provide Cancel, Back, Stop recording, correction, and reversible checklist actions. | [N1] |
 | Error prevention | Require review before saving AI proposals; clarify quantities rather than invent them. | [N1] |
 | Recognition rather than recall | Keep ingredient quantities visible during review and recent-item shortcuts available in the assistant. | [N1] |
-| Discoverable navigation | Keep the three labelled destinations visible instead of hiding them in a hamburger menu. | [N2] |
+| Discoverable navigation | Keep the five confirmed labelled destinations visible instead of hiding them in a hamburger menu or overflow. | [N2] |
 | Comfortable touch | Use generous targets and spacing, especially during cooking and shopping. | [N3] |
 
 NN/G discusses roughly **1 cm × 1 cm physical touch targets** and explains why physical context matters. Do not describe that as an exact number of CSS pixels; verify the rendered experience on real devices.
@@ -88,7 +90,7 @@ These exclusions are the user's design direction, not a statement that Apple req
 
 ## 4. Semantic colour system
 
-The user-supplied direction is **orange primary in light mode, gold primary in dark mode**, with pink support and neutral backgrounds. The following exact hex values are **proposed custom Tally tokens**, not approved final branding or Apple system-colour values.
+The addendum confirms **orange primary in light mode; gold replaces orange in dark mode; pink is tertiary; black and white form the secondary foundation**. Its suggested starting shades are orange `#F97316`, gold `#E8B44B`, and pink `#F3A6BF`. Exact shades remain adjustable. The following values are **proposed custom Tally tokens**, not approved final branding or Apple system-colour values; neutral surface variants support the black/white foundation.
 
 | Token | Light | Dark | Intended role |
 | --- | --- | --- | --- |
@@ -99,16 +101,16 @@ The user-supplied direction is **orange primary in light mode, gold primary in d
 | `text-secondary` | `#62625F` | `#B7B7BC` | Secondary information |
 | `separator` | `#D9D7D1` | `#45454B` | Decorative division only |
 | `control-outline` | `#787872` | `#85858C` | Essential unfilled-control boundaries |
-| `accent-fill` | `#FF771C` | `#E9B748` | Primary action fill |
+| `accent-fill` | `#F97316` | `#E8B44B` | Primary action fill; addendum starting shades |
 | `on-accent` | `#191919` | `#191919` | Text/icons on accent fills |
-| `accent-text` | `#B54400` | `#E9B748` | Interactive text and essential accent icons |
-| `support-pink` | `#F0A5BE` | `#F2AAC4` | Restrained secondary emphasis |
+| `accent-text` | `#B54400` | `#E8B44B` | Interactive text and essential accent icons |
+| `tertiary-pink` | `#F3A6BF` | `#F3A6BF` | Restrained tertiary emphasis; dark variant may be refined |
 
 ### Colour-use rules
 
 - Give a colour one consistent semantic purpose. Selection, danger, and success must not become interchangeable. [A1]
 - Orange/gold are brand/action accents, not automatic warnings or nutrition indicators.
-- Use pink as supporting colour, not the sole indicator of an actionable control or state.
+- Use pink as tertiary colour, not a second primary or the sole indicator of an actionable control or state.
 - Pair every meaningful colour state with text, an icon, a checkmark, or a boundary change.
 - Use separate tokens for destructive, warning, success, focus, and disabled states. Choose and verify those pairs during implementation; don't guess that a familiar red or green is accessible.
 - Honour system light/dark preference initially, with an explicit user override.
@@ -123,22 +125,22 @@ Calculated with the WCAG sRGB relative-luminance formula; ratios below are round
 | --- | --- | --- |
 | `#191919` / `#FFFFFF` | 17.58:1 | Primary light text |
 | `#62625F` / `#F7F6F2` | 5.66:1 | Secondary light text |
-| `#191919` / `#FF771C` | 6.62:1 | Dark label on orange button |
-| `#FFFFFF` / `#FF771C` | 2.66:1 | **Do not use for normal button text** |
+| `#191919` / `#F97316` | 6.27:1 | Dark label on orange button |
+| `#FFFFFF` / `#F97316` | 2.80:1 | **Do not use for normal button text** |
 | `#B54400` / `#FFFFFF` | 5.54:1 | Accessible light-mode accent text |
-| `#191919` / `#E9B748` | 9.49:1 | Dark label on gold button |
+| `#191919` / `#E8B44B` | 9.26:1 | Dark label on gold button |
 | `#B7B7BC` / `#1C1C1E` | 8.52:1 | Secondary dark text |
 | `#787872` / `#FFFFFF` | 4.44:1 | Essential light control outline |
 | `#85858C` / `#1C1C1E` | 4.64:1 | Essential dark control outline |
 
-Orange `#FF771C` against white is also only 2.66:1: it cannot be the only essential icon or control boundary there. Use `accent-text`, a qualifying outline, or another tested treatment. Low-contrast separators are decorative, not checkbox borders or focus indicators.
+Orange `#F97316` against white is also only 2.80:1: it cannot be the only essential icon or control boundary there. Use `accent-text`, a qualifying outline, or another tested treatment. Low-contrast separators are decorative, not checkbox borders or focus indicators.
 
 For this web app, use WCAG 2.2 thresholds: normal text ≥4.5:1; large text ≥3:1 only at ≥24 CSS px regular or ≥18.67 CSS px bold; essential non-text controls/states ≥3:1 against adjacent colours. Small bold text does **not** automatically qualify as large text. [W1, W2]
 
 ## 5. Typography and hierarchy
 
 - On iOS, use the system font through `-apple-system`, `BlinkMacSystemFont`, and appropriate system fallbacks. Do not bundle an unlicensed SF Pro font file.
-- Use Plus Jakarta Sans for the Android-oriented treatment, with a system/sans-serif fallback if loading fails.
+- The addendum provisionally interprets “jartaka” as **Plus Jakarta Sans**. Confirm that exact Google font family before implementation; Android's precise mapping remains open. Until settled, use a reliable system/sans-serif fallback rather than treating the interpretation as approved.
 - Prefer readable regular/medium text; use semibold for important actions and headings. Avoid ultralight recipe instructions.
 - Proposed web scale: body 17 CSS px (`1.0625rem` with a default 16px root), supporting text 15–16px, metadata 13–15px, section titles 20–22px, screen titles 28–34px.
 - These web sizes are **Tally design choices**, not a literal conversion of Apple's point sizes. Apple's current guidance lists a 17pt default iOS text size. [A2, A3]
@@ -148,17 +150,26 @@ For this web app, use WCAG 2.2 thresholds: normal text ≥4.5:1; large text ≥3
 
 ## 6. Navigation and screen behaviour
 
-- Exactly three persistent, labelled bottom destinations: **Cookbook | AI Assistant | Groceries**.
-- Emphasise the centre AI destination without reducing the other targets or obstructing content.
+- Exactly five persistent, labelled bottom destinations in this order: **Home | Cookbook | AI Assistant | Groceries | Settings**.
+- AI is the third and centre destination; give it the strongest emphasis without reducing the other targets or obstructing content.
 - A tab navigates; it does not immediately start recording, save, scan, or create an item. [A4]
 - Preserve search, scroll position, and meaningful task state when switching destinations.
 - Keep all destinations available even when their collections are empty; explain empty states rather than disabling tabs.
 - Use a solid tab bar with a visible active state, icon, label, and safe-area padding.
-- Settings uses the consistent upper-right entry specified by the blueprint. The AI screen also has recent-recipe and recent-list shortcuts.
+- Settings is the fifth bottom tab and no longer needs repeating in each main-page header. The AI screen retains direct recent-recipe and recent-list shortcuts.
 - Recipe details, list details, account screens, and editors are secondary screens, not additional bottom tabs.
 - Use familiar Back/Cancel controls and browser history. Gestures are optional shortcuts, never the only way out.
 
-The screenshot's “AI third” and “Settings no longer ... every page” text conflicts with the PDF. The working basis remains the previously communicated blueprint arrangement; flag the conflict rather than silently treating the screenshot as a final navigation revision.
+The new addendum resolves the earlier screenshot/PDF navigation conflicts: five tabs make AI both third and centred, and Settings moves to its own tab. Do not reintroduce the old three-tab bar or mandatory header Settings shortcut.
+
+### Home design
+
+- Home is a confirmed native-feeling app destination, not a marketing landing page.
+- Proposed modules are a welcome greeting, Continue cooking/latest recipe, latest grocery list, Talk to your AI, and optional kitchen overview. The exact module selection and wireframe are **not final approved UI**.
+- Treat Continue cooking as a route back to the latest recipe, not evidence of tracked cooking progress.
+- If chosen, a Talk to your AI action opens the assistant; starting voice still requires an explicit microphone action.
+- Base any overview on real saved records; never invent pantry quantities, activity, recipe counts, or shopping progress.
+- Keep the screen restrained and task-focused, with the same solid surfaces, accessible scaling, safe areas, transitions, keyboard handling, and touch feedback as all other screens.
 
 ## 7. Touch, layout, and PWA constraints
 
@@ -167,6 +178,7 @@ The screenshot's “AI third” and “Settings no longer ... every page” text
 - Provide spacing between competing targets; enlarge the hit area around small visible icons.
 - Keep destructive actions away from frequent checklist and microphone controls.
 - Use safe-area insets and sufficient bottom content padding so the final row is never hidden by navigation.
+- With five tabs, verify all labels and targets fit narrow supported phones and enlarged text. Do not solve crowding by hiding a tab, removing accessible names, shrinking hit areas, or adding overflow.
 - Accommodate the virtual keyboard; keep message input, current field, and submit control visible.
 - Use real buttons, links, labels, headings, lists, and form controls rather than clickable generic containers.
 - Responsive web layouts must work on phones, tablets, and desktop without horizontal scrolling or fake device frames.
@@ -219,9 +231,10 @@ Checking groceries means **in the cart**, not purchased, consumed, or added to p
 - [ ] Press feedback, scrolling, transitions, keyboard, and sheets behave like an app without layout jumps or hover dependence.
 - [ ] Installed launch is standalone; no website-style headers/footers or app-created browser chrome.
 - [ ] Solid surfaces; no glass, backdrop blur, or translucent navigation.
-- [ ] Orange light mode and gold dark mode; tested labels, icons, and control boundaries.
-- [ ] Three labelled tabs; AI centred; tab selection never starts recording.
-- [ ] Upper-right Settings and honest recent-item shortcuts.
+- [ ] Orange light mode, gold replacing orange in dark mode, tertiary pink, and black/white foundation; tested labels, icons, and control boundaries.
+- [ ] Five labelled tabs in the confirmed order; AI third/centred; tab selection never starts recording.
+- [ ] Settings in the fifth tab; no required header duplication; honest AI recent-item shortcuts.
+- [ ] Home feels native and uses only agreed modules and genuine data; wireframe suggestions are not mistaken for final requirements.
 - [ ] Fixed-format readable recipes; quantities and assumptions remain visible.
 - [ ] Explicit approval before a draft becomes a saved record.
 - [ ] Grocery checks are obvious, reversible, and persist for the correct dated list.
@@ -232,6 +245,7 @@ Checking groceries means **in the cart**, not purchased, consumed, or added to p
 
 ## Sources
 
+- **Product addendum:** `attached_assets/AI_Kitchen_Native_App_Design_Update_v1_1_1794819465733.pdf`, pages 1–3: confirmed five-tab navigation, proposed Home modules, confirmed colour roles, provisional font, and non-binding framework/name suggestions.
 - **[N1]** Nielsen Norman Group, [10 Usability Heuristics](https://www.nngroup.com/articles/ten-usability-heuristics/).
 - **[N2]** Nielsen Norman Group, [Basic Patterns for Mobile Navigation](https://www.nngroup.com/articles/mobile-navigation-patterns/).
 - **[N3]** Nielsen Norman Group, [Touch Targets on Touchscreens](https://www.nngroup.com/articles/touch-target-size/).

@@ -1,0 +1,16 @@
+{
+  "id": "./",
+  "name": "Tally — Your kitchen, kept close",
+  "short_name": "Tally",
+  "description": "Your own recipes and grocery lists, kept close.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f8f5ef",
+  "theme_color": "#f8f5ef",
+  "icons": [
+    { "src": "./tally-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "./tally-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
