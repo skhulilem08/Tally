@@ -1,0 +1,1 @@
+- [Project requirements](project-requirements.md) — Tally uses JavaScript, not TypeScript; the kitchen app is a native-style PWA.
