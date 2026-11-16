@@ -35,13 +35,16 @@ PWA describes the delivery technology only. A merely mobile-friendly website, re
 
 Browser-owned permission prompts, browser chrome when opened in a browser, installation UI, and OS/browser capability limits are outside full app control. Document those boundaries honestly; do not use them to excuse website-like design inside Tally. Do not promise indistinguishability from every native app or automatic access to native-only APIs.
 
-Apply requirements in this order:
+**Apple's official Human Interface Guidelines (HIG) are Tally's primary external design reference.** Use this design-reference hierarchy:
 
 1. The user's latest explicit instructions.
 2. Confirmed product requirements in `tally_specs.md`.
-3. This document's accessibility and interaction rules.
+3. **Apple HIG** for native component choice, hierarchy, navigation, interaction, typography, and platform behaviour, adapted to the user's solid-colour/no–Liquid Glass requirements.
 4. Supplied images as native look-and-feel design references, applied within the confirmed product, colour, material, and accessibility constraints.
-5. Proposed defaults, which remain adjustable.
+5. NN/G as supporting UX research, not an alternative primary design direction.
+6. Proposed defaults, which remain adjustable.
+
+MDN and W3C/WAI define correct web semantics and accessibility implementation; they are not competing visual styles. Apply their technical/accessibility requirements throughout this hierarchy. Other implementation skills must preserve this HIG-led direction rather than introduce a separate aesthetic.
 
 The architect reviewed the product constraints and the verified research before this guide was written. This is a project guide, not a claim of Apple endorsement or a globally installed Agent skill.
 
@@ -59,9 +62,9 @@ Where an image conflicts with confirmed requirements, retain the five-tab struct
 
 ## 2. Research basis and historical boundary
 
-### UX/UI specialist: Nielsen Norman Group
+### Supporting UX/UI research: Nielsen Norman Group
 
-Use these researched principles:
+Use these researched principles to support the primary Apple HIG direction:
 
 | Principle | Apply it to Tally | Source |
 | --- | --- | --- |
@@ -75,9 +78,9 @@ Use these researched principles:
 
 NN/G discusses roughly **1 cm × 1 cm physical touch targets** and explains why physical context matters. Do not describe that as an exact number of CSS pixels; verify the rendered experience on real devices.
 
-### Apple Developer guidance
+### Primary design reference: Apple Human Interface Guidelines
 
-Use Apple's enduring guidance on consistent interaction, semantic colour, readable typography, accessibility, and tab navigation. [A1–A5]
+Start design decisions with Apple's official [Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/), including consistent interaction, semantic colour, readable typography, accessibility, and tab navigation. [A1–A5, A8–A12] Use the supplied images to interpret the desired look within this framework; use NN/G to validate usability, not replace the native design basis.
 
 **Historical distinction:** Apple's archived iOS 7 documentation says bars were translucent by default. It also describes opaque-bar layouts and tint colours that indicate interactivity. [A6, A7] Therefore:
 
@@ -160,6 +163,17 @@ For this web app, use WCAG 2.2 thresholds: normal text ≥4.5:1; large text ≥3
 - Preserve hierarchy at large text sizes; stack information rather than truncating important labels.
 - Do not disable pinch zoom or rely on native Dynamic Type APIs that the PWA does not implement.
 
+### Iconography: Iconoir
+
+**Confirmed:** use **Iconoir** for Tally's interface icons, selecting simple outline glyphs closest in meaning and visual character to familiar iOS symbols. It is an independent library, not Apple SF Symbols or an exact reproduction of iOS icons.
+
+- Use `iconoir-react` consistently through the shared interface-icon adapter; do not mix Lucide or another unrelated icon family into screens.
+- Working five-tab mapping: Home → `HomeSimpleDoor`; Cookbook → `OpenBook`; AI Assistant → `Sparks`; Groceries → `ShoppingBag`; Settings → `Settings`.
+- Use a coherent outline treatment, inherited semantic colour, and optical alignment. The current working stroke is 1.5, with restrained 1.8 emphasis for active/central navigation; these are Tally choices, not Apple-mandated values.
+- Iconoir uses a 24×24 design grid and accepts standard SVG props. Set explicit rendered dimensions by context; keep the surrounding hit area large enough regardless of glyph size. [I1]
+- Preserve tab labels, accessible button names, and visible state cues. Decorative SVGs are hidden from assistive technology; an icon-only action still needs a meaningful accessible name.
+- Custom brand artwork/app icons are a separate asset category, not permission to introduce a second family of interface glyphs. Do not replace a meaningful symbol with a merely similar-looking but misleading one.
+
 ## 6. Navigation and screen behaviour
 
 - Exactly five persistent, labelled bottom destinations in this order: **Home | Cookbook | AI Assistant | Groceries | Settings**.
@@ -196,6 +210,71 @@ The new addendum resolves the earlier screenshot/PDF navigation conflicts: five 
 - Responsive web layouts must work on phones, tablets, and desktop without horizontal scrolling or fake device frames.
 - Installation hints must match the browser and appear only when relevant. Do not promise universal browser install prompts, background recording, or native haptics.
 
+### Native screen sections: structure and separation
+
+**Primary research:** Apple HIG Layout, Lists and tables, Scroll views, and Collections. Apple developer documentation for `Section` and the WWDC list-layout presentation provide supporting structural examples—not a requirement to change Tally to SwiftUI/UIKit. [A11, A13–A18]
+
+A native section is a **meaningful group inside a task-focused screen**, not a full-width marketing block or necessarily an HTML `<section>`. Separate the screen's navigation, content hierarchy, and temporary presentation:
+
+```text
+Screen
+  Navigation context: current screen / Back / relevant actions
+  Main content, usually one vertical scrolling area
+    Optional screen introduction or metadata
+    Content section
+      Optional concise section heading
+      Related rows, fields, media, or instructions
+      Optional supporting section footer
+    Next meaningful content section
+  Persistent five-tab navigation
+  Temporary sheet/dialog only when a separate modal task is necessary
+```
+
+This is a Tally structure model informed by Apple guidance, not a universal Apple-mandated template. A native screen may be mostly a single list; it does not need multiple sections, a card for everything, or a heading repeated above every group.
+
+#### Choose the right grouping pattern
+
+| Pattern | When it fits | How it is separated |
+| --- | --- | --- |
+| Plain list | A continuous collection such as saved recipes or dated history. | Aligned rows and restrained separators; optional meaningful headers. |
+| Grouped list | Distinct families of related settings or form fields. | Space and optional headers/footers between groups; row dividers within a group. |
+| Inset-grouped list | Clearly bounded, related controls or rows such as Settings groups. | An opaque group surface inset from the screen edges, with one outer group shape and consistent inner row alignment. |
+| Reading/detail sections | Ingredients, Method, and Notes in a recipe. | Typographic hierarchy, alignment and spacing; a surface or separator only when useful. Do not wrap every paragraph or step in a separate card. |
+| Collection/grid | Genuine visual content where images help identification, once real recipe media exists. | Repeated image/item geometry and consistent spacing. Text-first settings and groceries remain better suited to rows. |
+| Sheet/dialog | A temporary focused decision, review task, or editing task when modal presentation is justified. | A distinct accessible presentation with its own dismissal/focus rules, not simply another group inside the screen. |
+
+Plain, grouped, and inset-grouped are established native list appearances; none is mandatory for every screen. Grouping follows information relationships, not a desire to make everything look like a rounded card. [A11, A15, A17, A18]
+
+#### Separation and hierarchy rules
+
+1. **Group by meaning.** Keep related settings, quantities, or actions together. Use smaller spacing within a group and a clearer gap between unrelated groups. Exact spacing is a reusable Tally token, not an invented universal Apple pixel value. [A13]
+2. **Align the content.** Related text, values, and actions share deliberate leading/trailing guides. Indentation indicates hierarchy; it is not decoration. Allow reading order and alignment to adapt for right-to-left content where supported. [A13]
+3. **Use section headings to name the group.** Keep them concise and visually subordinate to the screen title. Use a logical heading hierarchy; not every group heading needs uppercase, oversized text, or a second description. [A11, A16, M2]
+4. **Use section footers for local explanation.** A note beneath a settings group explains those settings; it is not a website footer. Essential instructions and unresolved approval warnings must remain visible where needed, not hidden in faint fine print. [A11, A16]
+5. **Use row separators inside a shared group when helpful.** In typical icon-and-label list rows, align an inset separator with the primary text/content, not arbitrarily with the icon. Distinguish row separators from group boundaries. Decorative separators do not replace an accessible control boundary. [A18]
+6. **Avoid stacked outlines.** Do not add a border around the group, another card border around every row, and multiple dividers unless each communicates something necessary. Use the least decoration that preserves clear relationships. This restraint is a Tally design choice applying HIG grouping principles.
+7. **Distinguish row behaviours.** A navigation row opens detail and may use a disclosure chevron; a checkable grocery row changes selection and shows a check state; a value row is informational. Do not make every row look tappable or attach chevrons to all content. [A11]
+8. **Let content determine row height.** Respect text enlargement and multiline labels; do not force fixed-height groups that clip quantities, descriptions, or actions. Preserve the same grouping hierarchy at larger sizes. [A13]
+9. **Usually use one vertical scroll area.** Avoid vertically scrolling boxes nested inside a vertically scrolling screen. An independently scrolling assistant transcript is a deliberate conversation pattern, not permission to make every section scroll independently. Horizontal visual collections may sit inside a vertical screen if genuinely useful. [A14]
+10. **Keep navigation and the keyboard from covering content.** Apply safe areas and sufficient content insets. Sticky section headers are optional and need a useful orientation purpose; they must not accumulate into obstructing bars. Keep the active field and its relevant actions reachable. [A13, A14]
+11. **Preserve context.** Restore meaningful scroll/task state on return, and scroll automatically only enough to reveal the relevant field or result. Do not jump to the top because a checkbox changed. [A14]
+12. **Use opaque separation.** Where current HIG examples recommend glass, blur, or scroll-edge materials, retain only the hierarchy/orientation intent. Tally uses solid bars/surfaces, spacing, and appropriate separators instead.
+
+#### Application to Tally
+
+| Screen | Working section structure |
+| --- | --- |
+| Home | A concise app welcome and a restrained set of genuine latest-item/assistant entry groups. No marketing hero-to-features-to-footer sequence; no invented activity. Home module selection remains adjustable. |
+| Cookbook | Screen context and search followed by a coherent recipe list. Add meaningful grouping only if useful real data supports it; do not fabricate categories or counts. |
+| Recipe detail | Title and known metadata, then Ingredients, ordered Method, and optional Notes/media. Keep cooking instructions readable as content, not dashboard tiles. |
+| Recipe editor | Related identity/serving fields, ingredient rows, method steps, optional notes, and explicit save/approval actions. Keep validation with the relevant field/group. |
+| AI Assistant | Recent saved-item shortcuts, a conversation area, and reachable composer; draft review is a distinct group/presentation that remains clearly unsaved until approval. |
+| Groceries history | Clear dated list rows; temporal sections only when useful. An individual list has context/progress, one coherent checklist or real category groups, and local shopping guidance. Checking a row must not restructure the whole screen. |
+| Grocery planning | Related recipe/serving choices, on-hand inventory input, and a separate unsaved review/approval group. Do not bury incompatible-unit warnings in a distant section. |
+| Settings | Related inset-grouped rows/choices, with useful local labels/explanations. Account, appearance, and privacy remain distinguishable; only actual implemented preferences appear actionable. |
+
+Reuse contracts such as **SectionGroup, SectionHeading, SectionFooter, ListRow, ChecklistRow, and RowSeparator** for repeated patterns. These are shared design responsibilities, not claims that components with those names already exist in code. Use semantic headings/lists/labels underneath; an HTML `<section>` is appropriate for a thematic headed group, while a neutral layout wrapper may simply be a `<div>`.
+
 ## 8. Required interaction states
 
 | Area | Required behaviour |
@@ -226,7 +305,91 @@ Checking groceries means **in the cart**, not purchased, consumed, or added to p
 - Keep overlays/dialogs keyboard accessible and prevent unintended interaction with underlying content.
 - Treat VoiceOver and keyboard support as behaviour to verify, not a checkbox satisfied by adding ARIA everywhere.
 
-## 10. Apply this guide
+## 10. App elements and reusable component contracts
+
+Research checked: 16 November 2026. Apple HIG describes native interface components and behaviour; MDN and W3C describe the semantic HTML and accessibility implementation underneath Tally. **An HTML element is not a visual style.** Using `<header>`, `<p>`, or `<nav>` does not require website-like chrome, browser-default styling, or document reloads.
+
+This is a practical Tally catalogue, not an exhaustive list of HTML or permission to add every possible component. These contracts are design/implementation requirements, not a claim that the current app has already passed an element-by-element audit.
+
+### Semantic element catalogue
+
+| Purpose | HTML foundation | Tally rule / example |
+| --- | --- | --- |
+| Screen content | `<main>` | One visible main content landmark for the active screen; name the screen clearly. |
+| App/screen header | `<header>` | Native-style screen identity, Back, and contextual actions; not a desktop website masthead. A header is not itself a heading. |
+| Screen and section titles | `<h1>`–`<h6>` | Prefer one `<h1>` for the active screen, then logical `<h2>`/`<h3>` sections. Choose level by hierarchy, not desired font size. |
+| Body text | `<p>` | Recipe description, guidance, explanatory copy. Use consistent body typography rather than default browser margins. |
+| Inline text | `<span>`, `<strong>`, `<em>`, `<small>` | Inline grouping, meaningful importance/emphasis, or secondary annotations. Do not use `<small>` as an excuse for unreadable text. |
+| Thematic content groups | `<section>` with a heading | Ingredients, Method, account preferences; use `<div>` instead when grouping is purely for layout. |
+| Self-contained content | `<article>` where appropriate | A standalone recipe can be an article; every decorative card does not need article semantics. |
+| Neutral layout | `<div>`, `<span>` | Layout wrappers only; not substitutes for buttons, links, headings, or form labels. |
+| Destination navigation | `<nav>` and `<a href>` / router links | Five bottom destinations with visible labels and `aria-current="page"` for the active destination. Use real URL/history behaviour without routine document reloads. |
+| Actions | `<button>` | Save, Delete, retry, open a sheet, add an ingredient. Set `type="button"` unless submitting a form; give icon-only buttons an accessible action name. |
+| Forms | `<form>` | Explicit recipe approval and other submissions; support keyboard submit, validation, pending state, and input preservation. |
+| Labels and related fields | `<label>`, `<fieldset>`, `<legend>` | Associate labels with controls; group related choices. A placeholder is a hint, not the only label. |
+| Short text / search / credentials | `<input>` with suitable `type` | Recipe title, search, email/password. Use suitable autocomplete and input purpose; auth remains Clerk-managed. |
+| Quantities and numeric entry | `<input>` with suitable numeric semantics and `inputmode` | Servings and amounts; allow appropriate decimals, visible units, validation, and locale-aware entry. Never silently turn an unknown value into zero. |
+| Long text | `<textarea>` | Method steps, notes, assistant composer; preserve wrapping, focus, keyboard access, and draft input. |
+| Choice controls | `<select>`, `<option>`, labelled radio inputs | Unit choice or one-of-many preferences. A three-choice theme selector is not three unrelated on/off switches. |
+| Checklist selection | Labelled `<input type="checkbox">` | Grocery check-off and recipe selection, with a generous row target. A toggle-button implementation must instead expose its actual pressed state consistently; don't present a decorative checkmark as a control. |
+| Collections and steps | `<ul>`, `<ol>`, `<li>` | Ingredients/checklists/history as lists where appropriate; ordered method steps as an ordered list. |
+| Label/value information | `<dl>`, `<dt>`, `<dd>` | Metadata such as servings, preparation duration, and account fields where a description list fits. |
+| Truly tabular data | `<table>`, `<caption>`, `<th>`, `<td>` | Only real row/column relationships, not screen layout. Apple “table views” do not mean every native-looking list should be an HTML table. |
+| Images and captions | `<img>`, `<figure>`, `<figcaption>` | Meaningful alternative text for informative images; empty alt for decorative ones. Keep user media distinct from illustration. |
+| Icons | `<svg>` or an accessible icon component | Decorative icons are hidden from assistive technology; the enclosing action retains a readable name. Icons must not be the only unfamiliar state cue. |
+| Audio/video, when implemented | `<audio>`, `<video>`, `<track>` | Real controls and appropriate text alternatives/captions; not fake playback or a claim that uploads already work. |
+| Dates | `<time datetime="…">` | Human-readable list/save dates with a machine-readable timestamp where useful. |
+| Progress | Labelled `<progress>` or correctly implemented progress semantics | Real upload/task/checklist progress; do not fabricate percentages or confuse progress with nutrition data. |
+| Disclosure | `<details>`, `<summary>` where appropriate | Optional secondary explanation; do not hide essential approval details, ingredients, or core navigation. |
+| Modal sheet / dialog | `<dialog>` opened modally, or a fully implemented accessible dialog | Label it, place and contain focus, make background content inert, support appropriate dismissal, and restore focus. Round corners alone do not make a native sheet. |
+| Status and errors | Suitable text with `role="status"` / `aria-live`, or an appropriate alert | Announce saves, results, and relevant failures without moving focus unnecessarily. Reserve interruptive alerts for urgency; don't announce every streamed AI token. |
+| Footer / supplementary content | `<footer>`, `<aside>` only when semantically appropriate | These tags are allowed, but do not introduce marketing footers, desktop sidebars, or extra app chrome just to use them. |
+
+Sources: MDN element/heading/button/input references [M1–M4]; W3C landmarks, button, dialog, ARIA and status guidance [P1–P6, W3].
+
+**Navigation is not automatically an ARIA tabs widget.** Tally's five route destinations use navigation links. Only use `tablist`/`tab`/`tabpanel` for an actual layered-panel widget and implement its full selection, focus, relationships, and keyboard model. Do not add `role="application"` to the whole app merely because Tally is an app. Prefer correct native HTML semantics; adding a role promises the corresponding behaviour, not just a visual appearance. [P1–P6]
+
+### Apple HIG component guidance translated to Tally
+
+| HIG component | Native behaviour to retain | Web implementation boundary |
+| --- | --- | --- |
+| Buttons [A8] | Recognisable actions, immediate press feedback, space around targets, restrained action prominence. | Use real buttons for actions; adapt appearance to Tally's opaque colour tokens. |
+| Text fields [A9] | Short, specific input; persistent purpose/labels, appropriate validation, logical field order. | Use inputs for short values and textareas for long content; retain browser autofill and keyboard capabilities. |
+| Toolbars/navigation [A10] | Orient people with useful current-view context, Back, and relevant actions; app name alone is not a useful title for every view. | Use semantic headers and appropriate links/buttons. No Liquid Glass material treatment. |
+| Lists and tables [A11] | Clear grouping, scannable rows, concise labels, selection feedback appropriate to navigation versus toggling. | Choose list, checkbox, link, or table semantics according to meaning—not native control naming. |
+| Alerts [A12] | Use sparingly for critical, actionable information or uncommon irreversible destruction. | Routine saved feedback stays inline/nonmodal; irreversible recipe/list deletion needs a clear confirmation. |
+| Tab bars [A4] | Stable labelled destinations, preserved task state, navigation rather than automatic actions. | Keep the five routes and centred AI; selecting AI never starts recording. |
+
+Current HIG material examples may use Liquid Glass; **only the applicable behavioural, hierarchy, and accessibility guidance is adopted**. Tally's solid-colour exclusion remains authoritative. Apple points and CSS pixels are not interchangeable; use the separately documented Tally hit-target rules.
+
+### Consistency across components and implementation skills
+
+Use one shared contract for each repeated pattern, rather than reinterpreting it on every screen:
+
+- **Screen header/title:** same title hierarchy, Back placement, contextual-action treatment, and safe-area behaviour.
+- **Buttons/icon buttons:** shared primary, secondary, destructive, loading, disabled, pressed, and focus states.
+- **Fields and choices:** consistent labels, hints, units, validation, spacing, and keyboard behaviour.
+- **Collection rows:** consistent title/metadata/chevron treatment for navigation; distinct checkable-row semantics for shopping.
+- **Sheets/dialogs:** shared dismissal, focus/inertness, confirmation wording, and recovery behaviour.
+- **Feedback:** consistent loading, empty, no-results, offline, error/retry, Draft, Saving, and Saved treatments.
+- **Tokens:** reuse the same semantic colours, typography roles, spacing, radii, icon sizing, and motion conventions. Exact unapproved values remain design choices; do not invent separate theme systems for individual features.
+
+Read this guide with `tally_specs.md` for every UI change. Apply the relevant implementation guidance **in addition**, not as a competing visual system:
+
+**All participating implementation skills follow the same primary design reference: Apple HIG, within the user's explicit constraints.** Researching another source or using a third-party component does not authorise a different design direction.
+
+| Implementation guidance | Consistency obligation |
+| --- | --- |
+| React/Vite and frontend conventions | Reuse component contracts and accessible semantics in JavaScript/JSX; preserve route, state, and responsive behaviour. |
+| Design implementation | Pass both project guides and image references into the design brief; no generic restyling that ignores them. |
+| Clerk auth | Sign-in, sign-up, and account states share Tally's typography, colours, surfaces, and interaction standards without weakening provider authentication. |
+| AI integration | Conversation, recording when implemented, and draft approval use the same feedback/control patterns; provider output cannot invent layouts or save automatically. |
+| Object storage/media | Future uploads use the same labelled controls, progress, error/retry and destructive-confirmation patterns while keeping media private. |
+| Accessibility/testing | Verify semantics and behaviour, not screenshots alone. Use proportionate checks and follow the testing guidance's limits on browser runs. |
+
+Project guide names here describe how to apply the relevant supplied skills; they do **not** claim that those platform-managed skill files were rewritten or that a global design-system library was installed.
+
+## 11. Apply this guide
 
 1. Read `tally_specs.md` and identify the exact journey being designed.
 2. Separate confirmed requirements from recommendations and open choices.
@@ -239,7 +402,14 @@ Checking groceries means **in the cart**, not purchased, consumed, or added to p
 ### Design acceptance checklist
 
 - [ ] Native appearance **and interaction** pass real-phone review; “responsive website” is not an acceptable substitute.
+- [ ] Apple HIG is the primary design basis; images inform its visual interpretation and NN/G remains supporting research.
+- [ ] Interface glyphs use Iconoir consistently, with coherent dimensions/strokes, semantic meaning, large hit areas, and accessible labels.
 - [ ] Actual screens were compared against the supplied images for composition, hierarchy, grouping, controls, and spacing—not just food photography.
+- [ ] Elements match their purpose: logical headings, labelled fields, navigation links for destinations, buttons for actions, and correctly exposed selection/status.
+- [ ] Repeated controls and all supporting/auth/error screens use the same component contracts and semantic tokens.
+- [ ] Sections group related content using appropriate list/detail patterns, deliberate spacing, aligned rows, optional local headers/footers, and restrained separators—not repeated website-style panels.
+- [ ] Text enlargement, scrolling, sticky elements, safe areas, and keyboard changes preserve section relationships without hiding content or causing unnecessary nested scrolling.
+- [ ] Dialog focus/inertness/dismissal and screen-reader status announcements behave correctly; ARIA is not used as styling.
 - [ ] Routine navigation has no document reloads; tab/back navigation preserves relevant state.
 - [ ] Press feedback, scrolling, transitions, keyboard, and sheets behave like an app without layout jumps or hover dependence.
 - [ ] Installed launch is standalone; no website-style headers/footers or app-created browser chrome.
@@ -258,6 +428,7 @@ Checking groceries means **in the cart**, not purchased, consumed, or added to p
 
 ## Sources
 
+- **Primary design reference:** Apple Developer, [Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/). Component-specific HIG sources are listed below; Tally excludes Liquid Glass styling.
 - **Product addendum:** `attached_assets/AI_Kitchen_Native_App_Design_Update_v1_1_1794819465733.pdf`, pages 1–3: confirmed five-tab navigation, proposed Home modules, confirmed colour roles, provisional font, and non-binding framework/name suggestions.
 - **[N1]** Nielsen Norman Group, [10 Usability Heuristics](https://www.nngroup.com/articles/ten-usability-heuristics/).
 - **[N2]** Nielsen Norman Group, [Basic Patterns for Mobile Navigation](https://www.nngroup.com/articles/mobile-navigation-patterns/).
@@ -271,3 +442,26 @@ Checking groceries means **in the cart**, not purchased, consumed, or added to p
 - **[A7]** Apple Developer Archive, [iOS 7 UI Transition Guide: Appearance and Behavior](https://developer.apple.com/library/archive/documentation/UserExperience/Conceptual/TransitionGuide/AppearanceCustomization.html).
 - **[W1]** W3C, [WCAG 2.2: Understanding Contrast (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html).
 - **[W2]** W3C, [WCAG 2.2: Non-text Contrast](https://www.w3.org/TR/WCAG22/#non-text-contrast).
+- **[A8]** Apple Developer, [HIG: Buttons](https://developer.apple.com/design/human-interface-guidelines/buttons).
+- **[A9]** Apple Developer, [HIG: Text fields](https://developer.apple.com/design/human-interface-guidelines/text-fields).
+- **[A10]** Apple Developer, [HIG: Toolbars](https://developer.apple.com/design/human-interface-guidelines/navigation-bars). The navigation-bars URL currently resolves to the Toolbars guidance; glass styling is excluded.
+- **[A11]** Apple Developer, [HIG: Lists and tables](https://developer.apple.com/design/human-interface-guidelines/lists-and-tables).
+- **[A12]** Apple Developer, [HIG: Alerts](https://developer.apple.com/design/human-interface-guidelines/alerts).
+- **[M1]** MDN, [HTML elements reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements).
+- **[M2]** MDN, [Heading elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/Heading_Elements).
+- **[M3]** MDN, [Button](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/button).
+- **[M4]** MDN, [Input](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input).
+- **[P1]** W3C WAI APG, [Landmark regions](https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/).
+- **[P2]** W3C WAI APG, [Button pattern](https://www.w3.org/WAI/ARIA/apg/patterns/button/).
+- **[P3]** W3C WAI APG, [Tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
+- **[P4]** W3C WAI APG, [Modal dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/).
+- **[P5]** W3C WAI APG, [No ARIA is better than bad ARIA](https://www.w3.org/WAI/ARIA/apg/practices/read-me-first/).
+- **[P6]** W3C WAI APG, [Patterns overview](https://www.w3.org/WAI/ARIA/apg/patterns/).
+- **[W3]** W3C, [WCAG 2.2: Status messages](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html).
+- **[A13]** Apple Developer, [HIG: Layout](https://developer.apple.com/design/human-interface-guidelines/layout). Adopt hierarchy, alignment, grouping, adaptability, and safe areas; exclude its Liquid Glass material treatment.
+- **[A14]** Apple Developer, [HIG: Scroll views](https://developer.apple.com/design/human-interface-guidelines/scroll-views). Adopt scroll behaviour and context; exclude blur/material effects.
+- **[A15]** Apple Developer, [HIG: Collections](https://developer.apple.com/design/human-interface-guidelines/collections).
+- **[A16]** Apple Developer, [SwiftUI: Section](https://developer.apple.com/documentation/swiftui/section). Structural reference for grouping with optional headers/footers, not a Tally framework choice.
+- **[A17]** Apple Developer, [WWDC20: Lists in UICollectionView](https://developer.apple.com/videos/play/wwdc2020/10026/), list appearances and configuration around 3:02–4:09.
+- **[A18]** Apple Developer, [WWDC20: List separator alignment](https://developer.apple.com/videos/play/wwdc2020/10026/?time=542), around 9:02–11:19.
+- **[I1]** Iconoir, [Official React documentation](https://iconoir.com/docs/packages/iconoir-react), including its 24×24 grid, standard SVG props, and default stroke treatment.

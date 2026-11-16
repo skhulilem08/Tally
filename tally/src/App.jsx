@@ -8,7 +8,7 @@ import {
   CircleHelp, Clock3, CookingPot, House, ListChecks, LoaderCircle, LogOut,
   MessageCircle, MoreHorizontal, Plus, Search, Send, Settings as SettingsIcon,
   ShoppingBasket, Sparkles, Sun, Moon, Trash2, UserRound, X,
-} from 'lucide-react'
+} from './icons.jsx'
 import { api } from './api.js'
 import { useKitchenData } from './useKitchenData.js'
 import './App.css'
@@ -234,7 +234,7 @@ function AppShell({ children }) {
         {tabs.map(({ href, label, Icon }, index) => {
           const selected = location === href || (href === '/home' && location === '/') || (href !== '/home' && location.startsWith(href))
           return <Link key={href} href={href} className={`tab-item ${selected ? 'selected' : ''} ${index === 2 ? 'tab-assistant' : ''}`} aria-current={selected ? 'page' : undefined} data-testid={`tab-${label.toLowerCase().replace(' ', '-')}`}>
-            <span className="tab-icon"><Icon size={index === 2 ? 22 : 20} strokeWidth={selected || index === 2 ? 2.2 : 1.8} /></span><span className="tab-label">{label}</span>
+            <span className="tab-icon"><Icon size={index === 2 ? 22 : 20} strokeWidth={selected || index === 2 ? 1.8 : 1.5} /></span><span className="tab-label">{label}</span>
           </Link>
         })}
       </nav>

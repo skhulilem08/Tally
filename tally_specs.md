@@ -13,7 +13,7 @@ This specification combines:
 3. `attached_assets/IMG_1978_1794818558866.png`, colour, typography, navigation, and native-implementation reference.
 4. `attached_assets/IMG_1974_1794818558868.webp`, native-app visual reference for screen composition, hierarchy, solid surfaces, control styling, navigation treatment, and food photography.
 5. `attached_assets/IMG_1975_1794818558868.webp`, native-app visual reference for grouped information, rounded surfaces, touch controls, spacing, and food-led detail screens.
-6. Verified Nielsen Norman Group and Apple Developer guidance, reviewed with the architect and cited in `ui_design_skill.md`.
+6. **Apple Human Interface Guidelines (HIG), the primary external design reference**, with supporting Nielsen Norman Group UX research and MDN/W3C implementation guidance, cited in `ui_design_skill.md`. The initial Apple/NN/G research was reviewed with the architect.
 7. `attached_assets/AI_Kitchen_Native_App_Design_Update_v1_1_1794819465733.pdf`, *Specification Addendum 01 — Native-first app, five-tab navigation*, 15 November 2026, three pages. This update supersedes the original navigation and resolves the related screenshot conflicts.
 
 The user's direct clarifications override recommendations in the attachments. For product/design changes, the new addendum supersedes the original blueprint where they differ. Its native-framework recommendation does not override the user's explicit JavaScript/PWA stack choice. Reference imagery does not automatically add product features. Recommendations and open decisions below are deliberately distinct from confirmed scope.
@@ -265,16 +265,30 @@ Blueprint example: 300g beef for 2 servings becomes 600g for 4; 200g usable on h
 
 Apply [ui_design_skill.md](ui_design_skill.md) as the detailed design implementation guide.
 
+- **Confirmed:** Apple HIG is the primary external reference for Tally's design guidance and all participating implementation skills. The images inform the desired native visual interpretation; NN/G is supporting UX research. MDN/W3C govern semantic HTML and web accessibility, not a competing aesthetic. The user's explicit product, solid-colour, and no–Liquid Glass requirements remain binding.
+- Use the guide's researched semantic-element catalogue, Apple HIG component mappings, and shared component contracts for consistency across core screens, authentication, forms, dialogs, loading/error states, and future voice/media flows. HTML tag choice and native visual treatment are separate concerns.
+- Destinations use navigation links, actions use buttons, headings follow content hierarchy, and inputs retain labels and appropriate semantics. The five bottom routes are not automatically an ARIA tabs widget.
+- Follow relevant implementation skills alongside these project guides; they do not replace the shared visual/interaction rules or authorise weakening auth, privacy, validation, or explicit approval.
 - iOS 7+ inspired visual principles with solid, opaque surfaces and navigation; no Liquid Glass, frosted blur, translucent panels, or primary gradients.
 - **Confirmed colour roles:** orange primary in light mode; gold replaces orange in dark mode; pink is tertiary; black and white form the secondary foundation.
 - Addendum starting shades: orange `#F97316`, gold `#E8B44B`, pink `#F3A6BF`. These are suggestions, not final approved shades or Apple system constants; validate actual contrast pairs.
 - iOS uses system typography/SF Pro through the system font stack and accessible scaling. “Jartaka” is provisionally interpreted as Plus Jakarta Sans; confirm the exact Google font family before implementation. Android's precise font mapping remains open.
-- Readable hierarchy, generous useful spacing, consistent iconography, restrained transitions.
+- Readable hierarchy, generous useful spacing, **Iconoir** interface icons chosen for iOS-like clarity, and restrained transitions. Use one shared outline family; Iconoir is not Apple SF Symbols. See the icon mapping and sizing/accessibility rules in `ui_design_skill.md`.
 - Five visible labelled destinations in the confirmed order, prominent third/centre AI, safe-area padding.
 - Large tappable grocery rows and controls; visible focus, accessible names, colour-independent states.
 - Support 200% text enlargement, keyboard access, text alternatives to audio, and reduced motion.
 - Include empty, loading, no-results, offline, denied-permission, upload, failure/retry, draft, and saved states.
 - UI content must accurately reflect storage, recording, and sync state.
+
+### Native sections and content grouping
+
+Follow the **Native screen sections: structure and separation** guidance in `ui_design_skill.md`, researched primarily from Apple HIG Layout, Lists and tables, Scroll views, and Collections, with Apple's developer references for section headers/footers and native list appearances.
+
+- Structure screens around their task: navigation context, coherent scrolling content, meaningful groups/rows, and persistent bottom navigation. A modal sheet is a separate temporary task, not a decorative content section.
+- Choose plain/grouped/inset-grouped lists or reading/detail groups according to content. Not every group requires a card, title, border, or footer.
+- Separate unrelated groups with deliberate spacing and, where useful, solid surfaces; separate related rows with restrained aligned separators. Section footers explain their own group, not the whole app like a marketing footer.
+- Use native-feeling navigation rows, checkable rows, and informational rows distinctly. Preserve readable text, input, scroll position, safe areas, and keyboard access as groups grow.
+- Apply the screen-specific mappings in the design guide to Cookbook, recipe details/editing, AI, groceries, and Settings. This is researched design guidance, not a claim that the existing screens have already been restyled to every rule.
 
 ### How to use the supplied image references
 
@@ -352,6 +366,7 @@ This is not the full release: voice conversations, recipe photo/video uploads, f
 - [ ] Older lists remain independent and accessible.
 - [ ] Recent shortcuts open the actual latest saved records or clear empty states.
 - [ ] Solid-colour light/dark design follows orange/gold primary, tertiary pink, and black/white foundation, with tested contrast.
+- [ ] Screen sections follow HIG-led grouping and hierarchy, with consistent spacing, local headers/footers where useful, aligned row separators, and no website-style panel sequence or unnecessary nested scrolling.
 - [ ] Installable PWA behaviour is verified on supported browsers.
 - [ ] The critical journey works on a real phone; microphone denial has a usable text alternative.
 - [ ] Product copy distinguishes implemented features, pending work, drafts, and actual saved/synced data.
@@ -374,7 +389,11 @@ Do not fabricate these decisions. Home and Settings are now confirmed top-level 
 
 The source-linked research, historical caveats, proposed palette, calculated contrast pairs, and implementation checklist are in [ui_design_skill.md](ui_design_skill.md).
 
-Primary sources:
+The guide also includes Apple HIG button/text-field/toolbar/list/alert guidance, MDN semantic HTML references, and W3C WAI patterns for landmarks, actions, tabs, dialogs, and status messages. This is a researched specification, not proof that every existing component already conforms; implementation must be checked against it.
+
+**Primary design source:** [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/).
+
+Component-specific Apple references and supporting UX/accessibility sources:
 
 - [NN/G usability heuristics](https://www.nngroup.com/articles/ten-usability-heuristics/).
 - [NN/G mobile navigation](https://www.nngroup.com/articles/mobile-navigation-patterns/).

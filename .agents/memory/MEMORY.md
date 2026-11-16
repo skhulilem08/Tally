@@ -1,1 +1,1 @@
-- [Project requirements](project-requirements.md) — Tally uses JavaScript, not TypeScript; the kitchen app is a native-style PWA.
+- [Project requirements](project-requirements.md) — JavaScript/PWA delivery, strict native feel, Apple HIG as primary design reference, solid colours without Liquid Glass, and five tabs.
