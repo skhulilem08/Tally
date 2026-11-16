@@ -11,9 +11,10 @@ import { z } from 'zod'
 import { pool, record } from './db.js'
 import { logger } from './logger.js'
 import { CLERK_PROXY_PATH, clerkProxyMiddleware, getClerkProxyHost } from './clerk-proxy.js'
-import { approvalSchema, recipeSchema, planSchema, listApprovalSchema, assistantSchema } from './validation.js'
+import { approvalSchema, recipeSchema, planSchema, listApprovalSchema } from './validation.js'
 import { calculateGroceries } from './groceries.js'
-import { assistantReply } from './assistant.js'
+import { createAssistantRouter } from './assistant-route.js'
+import { requireSameOrigin } from './request-origin.js'
 
 export const app = express()
 app.disable('x-powered-by')
@@ -44,35 +45,16 @@ app.use(clerkMiddleware((req) => ({
 })))
 
 const router = express.Router()
+app.use('/api/assistant', createAssistantRouter())
 router.use((req, res, next) => {
   res.setHeader('Cache-Control', 'private, no-store')
   res.setHeader('Vary', 'Cookie')
   const { userId } = getAuth(req)
   if (!userId) return res.status(401).json({ error: 'Sign in to access your private kitchen.' })
   req.ownerId = userId
-  if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
-    const origin = req.headers.origin
-    const host = getClerkProxyHost(req)
-    const allowed = new Set([host, req.headers.host, ...(process.env.REPLIT_DOMAINS || '').split(',')])
-    // The browser-test/dev proxy can preserve a public Host while the real
-    // browser origin is the local Vite listener. Never allow these in production.
-    if (process.env.NODE_ENV !== 'production') {
-      allowed.add('localhost:5000')
-      allowed.add('127.0.0.1:5000')
-    }
-    if (req.headers['sec-fetch-site'] === 'cross-site') {
-      return res.status(403).json({ error: 'Open Tally directly to make this change.' })
-    }
-    if (origin) {
-      try {
-        if (!allowed.has(new URL(origin).host)) return res.status(403).json({ error: 'Request origin is not allowed.' })
-      } catch {
-        return res.status(403).json({ error: 'Invalid request origin.' })
-      }
-    }
-  }
   next()
 })
+router.use(requireSameOrigin)
 router.use(rateLimit({
   windowMs: 60000, limit: 180,
   keyGenerator: (req) => req.ownerId,
@@ -122,15 +104,6 @@ router.delete('/recipes/:id', async (req, res) => {
   const result = await pool.query('DELETE FROM tally_recipes WHERE id = $1 AND owner_id = $2 RETURNING id', [validId(req.params.id), req.ownerId])
   if (!result.rowCount) return res.status(404).json({ error: 'Recipe not found.' })
   res.json({ ok: true })
-})
-
-router.post('/assistant', rateLimit({
-  windowMs: 300000, limit: 20,
-  keyGenerator: (req) => req.ownerId,
-  message: { error: 'Give your kitchen assistant a moment. Please try again shortly.' },
-}), async (req, res) => {
-  const input = assistantSchema.parse(req.body)
-  res.json(await assistantReply(input))
 })
 
 router.post('/groceries/preview', async (req, res) => {

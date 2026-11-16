@@ -12,6 +12,8 @@ import {
 } from './icons.jsx'
 import { api } from './api.js'
 import { useKitchenData } from './useKitchenData.js'
+import { useRecipeRecommendations } from './useRecipeRecommendations.js'
+import { recordRecipeOpen, RECIPE_ACTIVITY_EVENT } from './recipeActivity.js'
 import './App.css'
 import './assistant.css'
 
@@ -263,9 +265,11 @@ function SignInPrompt({ title = 'Your kitchen is yours', children = 'Sign in to 
   return <section className="signed-out-card"><span className="prompt-icon"><UserRound size={22} /></span><h2>{title}</h2><p>{children}</p><div className="button-row"><Link className="button button-primary" href="/sign-in">{action}<ArrowRight size={17} /></Link><Link href="/sign-up" className="button button-secondary">Create account</Link></div></section>
 }
 
-function Home({ kitchen, isSignedIn, canUseKitchen, user }) {
+function Home({ kitchen, canUseKitchen, user }) {
   const recentRecipes = kitchen.recipes.slice(0, 3)
   const latestList = kitchen.lists[0]
+  const latestRecipe = kitchen.recipes[0]
+  const { recommendations } = useRecipeRecommendations(kitchen.recipes, user?.id || 'guest')
   const firstName = user?.firstName
   const [hour] = useState(() => new Date().getHours())
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
@@ -282,7 +286,7 @@ function Home({ kitchen, isSignedIn, canUseKitchen, user }) {
       <nav className="home-quick-actions" aria-label="Kitchen actions">
         <Link href="/cookbook/new" className="home-action-chip home-action-primary" data-testid="home-add-recipe"><Plus size={17} />Add recipe</Link>
         <Link href="/groceries/plan" className="home-action-chip" data-testid="home-plan-groceries"><ListChecks size={17} />Plan groceries</Link>
-        <Link href={isSignedIn ? '/assistant' : '/sign-in'} className="home-action-chip" aria-label={isSignedIn ? 'Ask Tally' : 'Sign in to ask Tally'} data-testid="home-ask-tally"><Sparkles size={17} />Ask Tally</Link>
+        <Link href="/assistant" className="home-action-chip" aria-label="Ask Tally" data-testid="home-ask-tally"><Sparkles size={17} />Ask Tally</Link>
       </nav>
 
       <ErrorNotice onRetry={kitchen.reload}>{kitchen.error}</ErrorNotice>
@@ -320,15 +324,53 @@ function Home({ kitchen, isSignedIn, canUseKitchen, user }) {
               </div>}
       </section>
 
-      <Link href={isSignedIn ? '/assistant' : '/sign-in'} className="home-assistant-banner" aria-label={isSignedIn ? 'Open Tally AI Assistant' : 'Sign in to use Tally AI Assistant'} data-testid="home-assistant-link">
-        <span className="home-assistant-copy">
-          <span className="home-icon-badge"><Sparkles size={18} /></span>
-          <strong>{isSignedIn ? 'Talk to Tally' : 'AI Assistant'}</strong>
-          <small>{isSignedIn ? 'Ask about a recipe or a plan.' : 'Sign in to start a conversation.'}</small>
-          <span className="home-assistant-cta">{isSignedIn ? 'Open assistant' : 'Sign in'}<ChevronRight size={16} /></span>
-        </span>
-        <img className="home-assistant-image" src={`${basePath}/kitchen-still-life.jpg`} alt="" />
-      </Link>
+      <section className="home-section home-feature-section" aria-labelledby="home-feature-heading">
+        <div className="home-section-heading">
+          <h2 id="home-feature-heading">Your latest recipe</h2>
+          <Link href="/cookbook" className="home-section-link">Cookbook<ChevronRight size={16} /></Link>
+        </div>
+        {!canUseKitchen || kitchen.loading
+          ? <div className="home-feature-skeleton" aria-label="Loading your latest recipe"><span /><span /></div>
+          : latestRecipe
+            ? <Link className="home-feature-recipe" href={`/cookbook/${latestRecipe.id}`} data-testid={`home-latest-recipe-${latestRecipe.id}`}>
+                <span className="home-icon-badge"><BookOpen size={18} /></span>
+                <span className="home-feature-copy">
+                  <strong>{latestRecipe.title}</strong>
+                  <small>{latestRecipe.servings} servings{latestRecipe.prepMinutes != null ? ` · ${latestRecipe.prepMinutes} min prep` : ''}</small>
+                </span>
+                <ChevronRight size={18} className="home-card-chevron" />
+              </Link>
+            : <div className="home-quiet-empty" data-testid="home-latest-recipe-empty">
+                <span className="home-empty-dot" aria-hidden="true" />
+                <p>Your saved recipes will appear here as you add them.</p>
+              </div>}
+      </section>
+
+      <section className="home-section home-recommendations-section" aria-labelledby="home-recommendations-heading">
+        <div className="home-section-heading">
+          <h2 id="home-recommendations-heading">Most opened</h2>
+          <Link href="/cookbook" className="home-section-link">Cookbook<ChevronRight size={16} /></Link>
+        </div>
+        {!canUseKitchen || kitchen.loading
+          ? <div className="home-recommendations-skeleton" aria-label="Loading most opened recipes"><span /><span /></div>
+          : recommendations.length
+            ? <div className="home-recommendation-list" aria-label="Most opened recipes">
+                {recommendations.map(({ recipe, openCount }) => (
+                  <Link key={recipe.id} className="home-recommendation-row" href={`/cookbook/${recipe.id}`} data-testid={`home-recommendation-${recipe.id}`}>
+                    <span className="home-icon-badge"><BookOpen size={18} /></span>
+                    <span className="home-recommendation-copy">
+                      <strong>{recipe.title}</strong>
+                      <small>Opened {openCount} {openCount === 1 ? 'time' : 'times'}</small>
+                    </span>
+                    <ChevronRight size={18} className="home-card-chevron" />
+                  </Link>
+                ))}
+              </div>
+            : <div className="home-quiet-empty" data-testid="home-recommendations-empty">
+                <span className="home-empty-dot" aria-hidden="true" />
+                <p>Your most-opened recipes will appear here.</p>
+              </div>}
+      </section>
 
       <section className="home-section home-groceries-section" aria-labelledby="home-grocery-heading">
         <div className="home-section-heading">
@@ -444,10 +486,20 @@ function EmptyState({ icon, title, detail, action }) {
   return <div className="empty-state"><span className="empty-icon">{icon}</span><h2>{title}</h2><p>{detail}</p>{action && <div className="empty-action">{action}</div>}</div>
 }
 
-function RecipeDetail({ recipe, kitchen, canUseKitchen }) {
+function RecipeDetail({ recipe, kitchen, canUseKitchen, user }) {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [busy, setBusy] = useState(false)
   const [, setLocation] = useLocation()
+  const recordedVisit = useRef(null)
+  const activityOwner = user?.id || 'guest'
+  useEffect(() => {
+    if (!canUseKitchen || !recipe?.id) return
+    const visit = `${activityOwner}:${recipe.id}`
+    if (recordedVisit.current === visit) return
+    recordedVisit.current = visit
+    recordRecipeOpen(localStorage, activityOwner, recipe.id)
+    window.dispatchEvent(new Event(RECIPE_ACTIVITY_EVENT))
+  }, [activityOwner, canUseKitchen, recipe?.id])
   if (!canUseKitchen) return <div className="page"><LoadingRows /></div>
   if (!recipe && kitchen.loading) return <div className="page"><LoadingRows /></div>
   if (!recipe) return <div className="page"><EmptyState icon={<BookOpen size={23} />} title="Recipe not found" detail="It may have been removed, or your cookbook hasn’t loaded yet." action={<Link className="button button-secondary" href="/cookbook">Back to cookbook</Link>} /></div>
@@ -580,9 +632,9 @@ function Assistant({ kitchen, isSignedIn, user }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [savedNotice, setSavedNotice] = useState('')
+  const [savedRecipeId, setSavedRecipeId] = useState('')
   const feedRef = useRef(null)
   const approvalRequestId = useRef(sessionStorage.getItem(`${draftKey}:request`) || idForRequest())
-  const [, setLocation] = useLocation()
   const latestRecipe = kitchen.recipes[0]
   const latestList = kitchen.lists[0]
   useEffect(() => { sessionStorage.setItem(chatKey, JSON.stringify(messages)) }, [messages, chatKey])
@@ -598,7 +650,6 @@ function Assistant({ kitchen, isSignedIn, user }) {
     event.preventDefault()
     const content = input.trim()
     if (!content || busy) return
-    if (!isSignedIn) { setLocation('/sign-in'); return }
     const previous = messages
     const outgoing = [...previous, { role: 'user', content }]
     setMessages(outgoing); setInput(''); setBusy(true); setError(''); setSavedNotice('')
@@ -624,8 +675,8 @@ function Assistant({ kitchen, isSignedIn, user }) {
     if (!clean.title || !clean.servings || !clean.ingredients.length || clean.ingredients.some((i) => !i.name.trim() || !i.amount || !i.unit.trim()) || !clean.steps.length) { setError('Finish the recipe details before approving. Tally will not guess missing amounts.'); return }
     setBusy(true); setError(''); setSavedNotice('')
     try {
-      const saved = await api('/recipes/approve', { method: 'POST', body: { recipe: clean, approved: true, requestId: approvalRequestId.current } })
-      kitchen.replaceRecipe(saved); setDraft(null); sessionStorage.removeItem(`${draftKey}:request`); approvalRequestId.current = idForRequest(); setSavedNotice(`Saved “${saved.title}” to your cookbook.`)
+      const saved = await kitchen.request('/recipes/approve', { method: 'POST', body: { recipe: clean, approved: true, requestId: approvalRequestId.current } })
+      kitchen.replaceRecipe(saved); setDraft(null); sessionStorage.removeItem(`${draftKey}:request`); approvalRequestId.current = idForRequest(); setSavedRecipeId(saved.id); setSavedNotice(`Saved “${saved.title}”${isSignedIn ? ' to your cookbook' : ' on this device'}.`)
     } catch (err) { setError(err.message || 'The recipe was not saved. Your draft is safe; try again.') }
     finally { setBusy(false) }
   }
@@ -635,11 +686,7 @@ function Assistant({ kitchen, isSignedIn, user }) {
       <Link href={latestRecipe ? `/cookbook/${latestRecipe.id}` : '/cookbook'} className="shortcut-chip" data-testid="assistant-latest-recipe"><BookOpen size={18} /><span><small>{latestRecipe ? 'Latest recipe' : 'Cookbook'}</small><strong>{latestRecipe?.title || 'Browse recipes'}</strong></span><ChevronRight size={16} /></Link>
       <Link href={latestList ? `/groceries/${latestList.id}` : '/groceries'} className="shortcut-chip" data-testid="assistant-latest-list"><ShoppingBasket size={18} /><span><small>{latestList ? 'Latest grocery list' : 'Groceries'}</small><strong>{latestList?.name || 'View your lists'}</strong></span><ChevronRight size={16} /></Link>
     </nav>
-    {!isSignedIn ? <section className="assistant-guest" aria-labelledby="assistant-guest-title">
-      <span className="assistant-guest-icon"><UserRound size={20} /></span>
-      <div className="assistant-guest-copy"><h2 id="assistant-guest-title">Sign in to chat</h2><p>Your guest kitchen stays on this device.</p></div>
-      <div className="assistant-guest-actions"><Link href="/sign-in" className="assistant-auth-link">Sign in<ChevronRight size={15} /></Link><Link href="/sign-up" className="assistant-auth-link">Create account<ChevronRight size={15} /></Link></div>
-    </section> : <>
+    <>
       <section className="conversation-panel" aria-label="Text conversation">
         <div className="conversation-feed" ref={feedRef} aria-live="polite">
           {messages.length === 0 && <div className="assistant-welcome"><span className="assistant-orbit"><Sparkles size={21} /></span><div><strong>What are we cooking?</strong></div></div>}
@@ -647,7 +694,7 @@ function Assistant({ kitchen, isSignedIn, user }) {
           {busy && <div className="typing-line"><span /><span /><span /><span className="sr-only">Tally is thinking</span></div>}
         </div>
         {error && <ErrorNotice>{error}</ErrorNotice>}
-        {savedNotice && <p className="success-notice" role="status"><CheckCircle2 size={17} />{savedNotice}<Link href={`/cookbook/${kitchen.recipes[0]?.id || ''}`}>Open cookbook</Link></p>}
+        {savedNotice && <p className="success-notice" role="status"><CheckCircle2 size={17} />{savedNotice}<Link href={`/cookbook/${savedRecipeId}`}>Open recipe</Link></p>}
         {draft && <section className="draft-card">
           <div className="draft-top"><div><span className="draft-status"><span /> Draft · not saved</span><h2>Review this recipe</h2></div><button type="button" className="icon-button" aria-label="Dismiss recipe draft" onClick={() => setDraft(null)}><X size={18} /></button></div>
           <p className="draft-explainer">Make any corrections. Nothing enters your cookbook until you approve it.</p>
@@ -661,10 +708,11 @@ function Assistant({ kitchen, isSignedIn, user }) {
           <label className="field-label">Notes<textarea rows="2" value={draft.notes || ''} onChange={(e) => editDraft('notes', e.target.value)} placeholder="Optional notes" /></label>
           <div className="draft-actions"><button type="button" className="button button-primary button-full" onClick={approve} disabled={busy}>{busy ? 'Saving…' : <><Check size={18} /> Approve &amp; Save</>}</button><button type="button" className="button button-secondary button-full" onClick={() => { setInput('Could we adjust this recipe?'); document.getElementById('assistant-message')?.focus() }}>Continue conversation</button></div>
         </section>}
+        {!isSignedIn && <p className="assistant-device-note">Messages use online AI. Recipes save on this device.</p>}
         <form className="message-composer" onSubmit={send}><label htmlFor="assistant-message" className="sr-only">Message Tally</label><textarea id="assistant-message" rows="1" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); e.currentTarget.form.requestSubmit() } }} placeholder="Message Tally…" /><button className="send-button" type="submit" disabled={!input.trim() || busy} aria-label="Send message"><Send size={19} /></button></form>
       </section>
       <p className="quiet-note"><CheckCircle2 size={15} /> Recipes stay drafts until you choose Approve &amp; Save.</p>
-    </>}
+    </>
   </div>
 }
 
@@ -927,7 +975,7 @@ function SettingsPage({ theme, setTheme, user, isSignedIn }) {
             </label>)}
           </div>
         : <div className="settings-privacy-copy">
-            {!isSignedIn && <section><h3>Guest kitchen</h3><p>Recipes and lists stay in this browser on this device. Clearing browser data removes them; they are not a cloud backup.</p></section>}
+            {!isSignedIn && <section><h3>Guest kitchen</h3><p>Recipes and lists stay in this browser on this device. Clearing browser data removes them; they are not a cloud backup. AI needs an internet connection and sends your conversation and current draft for processing, not your whole kitchen. Recipe-opening counts for Home recommendations stay on this device.</p></section>}
             {isSignedIn && <section><h3>Account</h3><p>Your cloud recipes and grocery lists are private to your signed-in account. The guest kitchen stays separate on this device.</p></section>}
             <section><h3>Assistant</h3><p>Messages are sent to Tally’s assistant service to prepare replies. Chat requires sign-in.</p></section>
             <section><h3>Your recipes</h3><p>Drafts are saved only after you approve them. Voice and recipe media aren’t available in this version.</p></section>

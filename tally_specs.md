@@ -81,7 +81,7 @@ PWA installation must use a valid manifest, suitable icons, secure hosting, and 
 
 | Destination | Position | Purpose |
 | --- | --- | --- |
-| Home | First tab | Premium native-feeling kitchen home screen; exact modules remain proposed. |
+| Home | First tab | Native kitchen home with genuine saved-recipe/meal promotion and most-opened recommendations. |
 | Cookbook | Second tab | Search and browse personal saved recipes. |
 | AI Assistant | Third tab, centred, strongest emphasis | Conversational recipe capture and grocery planning. |
 | Groceries | Fourth tab | Current/latest approved list and dated history. |
@@ -111,7 +111,9 @@ PWA installation must use a valid manifest, suitable icons, secure hosting, and 
 
 **Confirmed:** a dedicated Home tab that looks and behaves like a premium native app's home screen. It is not a website landing page or busy dashboard.
 
-**Proposed modules, not yet approved as final Home content:**
+**Confirmed personal promotion:** Home promotes the recipes and meals already saved in the current kitchen, not a fabricated catalogue or generic advertisement. Keep the promotion and recommendation sections visible even without content; concise empty-state text must explain that the user's recipes/meals will appear there. Recommend existing recipes by how often their detail pages are opened, with recent opens breaking ties. Opening is a proxy for cooking interest, not confirmation that a meal was cooked. Opening history is device-local and separated by guest/account; it is not cloud-synchronised cooking history. Deleted and unopened recipes must not be shown as most-opened recommendations.
+
+**Existing modules and optional extensions:**
 
 - **Welcome header:** short personal greeting and uncluttered identity.
 - **Continue cooking:** one-tap return to the latest recipe's details; no invented cooking-progress tracking.
@@ -255,9 +257,9 @@ Blueprint example: 300g beef for 2 servings becomes 600g for 4; 200g usable on h
 - **Confirmed guest choice:** guests can save recipes and grocery lists **on this device**, in this browser's local storage. Guest create/edit/delete, explicit list approval, quantity calculations, and shopping check-off must persist across reloads.
 - Keep the guest kitchen separate from every signed-in cloud account. Signing in must not silently upload/merge guest records; signing out must not erase them. A cloud authentication or network failure must never redirect a signed-in save into guest storage.
 - Guest data is not an authenticated cloud backup: anyone using that browser profile may access it, and clearing site/browser data removes it. Surface this distinction concisely in Settings and its privacy disclosure. Report blocked/full/corrupt storage explicitly instead of claiming a successful save.
-- Cloud AI chat remains account-only; guest recipe/list operations do not send their local records to the cloud.
+- **Guest access applies appwide, including AI Assistant.** Guests can chat, review/edit a proposed recipe and explicitly approve it into their device kitchen without signing in. AI requires internet access and sends the submitted conversation and current draft for processing; it does not automatically upload the whole guest cookbook or lists. Guest chats/drafts remain browser-session scoped; approved records persist in device storage.
 - Derive account identity from the authenticated server session, never a client-supplied owner ID.
-- Authorise every **cloud** read, write, AI operation, and media access against that account.
+- Authorise every private **cloud kitchen** read/write and media access against that account. The stateless AI proposal endpoint accepts guests without granting access to account storage. Validate requests, reject cross-site browser mutations, disable response caching, and bound AI usage by authenticated account or anonymous IP. Current rate limits are per running server, not a distributed billing quota.
 - Keep provider secrets server-side; never bundle secrets into frontend code.
 - Validate text, quantities, units, file type/size, and ownership.
 - Store media bytes in object storage, separate from structured recipe records.
@@ -363,7 +365,7 @@ This is the blueprint's recommended sequence, not a statement that the steps are
 
 The first useful end-to-end milestone remains: **sign in → create/review/approve a recipe → find it in Cookbook → reopen after refresh**.
 
-The requested architect consultation and specification updates preceded implementation. The first development build now includes the five-tab shell, account-scoped recipe storage, manual recipe editing/search, text AI drafts with explicit approval, deterministic grocery previews/approval, dated lists and persistent item checks, and device theme preferences. Home uses a restrained working selection of the proposed greeting/latest-item/assistant modules, not fabricated activity.
+The requested architect consultation and specification updates preceded implementation. The development build includes the five-tab shell, account-scoped and device-only guest recipe storage, manual recipe editing/search, guest-accessible text AI drafts with explicit approval, deterministic grocery previews/approval, dated lists and persistent item checks, and device theme preferences. Home promotes actual saved recipes/meals and recommends existing recipes using device-local opening counts, with visible empty states rather than fabricated activity.
 
 This is not the full release: voice conversations, recipe photo/video uploads, full offline editing/sync, final typography/branding decisions, and installed real-device acceptance remain outstanding. A passing build or browser test does not by itself satisfy the strict native-feel release gate.
 
@@ -375,7 +377,7 @@ This is not the full release: voice conversations, recipe photo/video uploads, f
 - [ ] Installed launch is standalone, with no app-created browser chrome or website-style page structure.
 - [ ] Register/sign in works, and two accounts cannot read/write each other's records or media.
 - [ ] Exactly five labelled bottom destinations, ordered Home, Cookbook, AI Assistant, Groceries, Settings; third/centre AI is most prominent.
-- [ ] Home is a native-feeling app screen, not a landing page; proposed widgets are not treated as approved or populated with fabricated activity.
+- [ ] Home is a native-feeling app screen with personal recipe/meal promotion and most-opened recommendations, visible empty sections, and no fabricated activity.
 - [ ] Settings opens from the fifth tab without requiring duplicate header shortcuts.
 - [ ] AI retains recent-recipe and recent-list shortcuts; recipe/list/profile/auth screens remain nested.
 - [ ] A casual recipe description becomes a readable fixed-format draft.
@@ -399,7 +401,7 @@ This is not the full release: voice conversations, recipe photo/video uploads, f
 
 - Logo/icon and name availability checks, without reopening the user's selected name Tally.
 - Final exact light/dark shades, exact Google font family, and Android font mapping.
-- Which proposed Home modules to include and their final content/layout.
+- Whether to add any optional Home modules beyond the confirmed personal content and existing kitchen actions.
 - Whole-cookbook versus selected-meal default; any weekly planning feature.
 - Exact recipe required fields and media placement.
 - Launch languages, voice character, interruption/latency expectations.

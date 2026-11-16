@@ -81,11 +81,17 @@ Use Hugeicons for Tally's interface icons.
 
 **How to apply:** Keep interface icons in one coherent Hugeicons family across screens; preserve iOS-appropriate meanings, accessible names and sufficient touch targets. Do not reintroduce Iconoir or replace custom brand artwork as part of an interface-icon change.
 
-Allow guest access with recipes and grocery lists saved on this device.
+Allow guest access appwide, including AI Assistant, with approved recipes and grocery lists saved on this device.
 
-**Why:** The user requested guest access and selected “Save on this device (recommended)”, rather than browse-only access.
+**Why:** The user requested guest access, selected “Save on this device (recommended)”, and subsequently clarified that “The ai and appwide should allow guests access”.
 
-**How to apply:** Preserve guest use without an account and keep its local records separate from signed-in cloud kitchens. Do not silently merge/upload guest records or erase them on sign-in/sign-out. Explain the absence of cloud backup without cluttering routine controls.
+**How to apply:** Do not gate AI conversation or recipe approval behind sign-in. Distinguish online AI message processing from device-only guest recipe/list storage. Keep guest records separate from signed-in cloud kitchens; do not silently merge/upload them or erase them on sign-in/sign-out. Explain the absence of cloud backup without cluttering routine controls.
+
+Home promotional content must feature existing saved recipes and meals, with visible empty sections and recommendations based on most-opened recipes.
+
+**Why:** The user specified personal recipes/meals as Home's promotional content, said empty sections must not be hidden, and chose most-opened recipes as an approximation of cooking interest.
+
+**How to apply:** Keep concise empty-state text explaining what personal content will appear. Do not invent catalogue records or hide empty promotion/recommendation sections. Treat opens as interest, not proof a recipe was cooked; recommendations must belong to the current kitchen.
 
 Use IndexedDB for future local-first storage with architect guidance; include truthful sync tracking in Settings when that feature is implemented.
 
@@ -103,4 +109,4 @@ Use five bottom tabs in this order: Home, Cookbook, AI Assistant, Groceries, Set
 
 **Why:** The user supplied a design addendum to update the Markdown specifications; it explicitly supersedes the original three-tab navigation.
 
-**How to apply:** Treat the old three-tab layout and unspecified fifth page as superseded. Home is confirmed, but its module selection remains proposed. The addendum's Expo/TypeScript recommendation and unselected name ideas do not override the user's JavaScript/PWA and Tally choices.
+**How to apply:** Treat the old three-tab layout and unspecified fifth page as superseded. Home's personal promotions and most-opened recommendations are confirmed by the user's subsequent clarification; other illustrative addendum modules are not automatically approved. The addendum's Expo/TypeScript recommendation and unselected name ideas do not override the user's JavaScript/PWA and Tally choices.

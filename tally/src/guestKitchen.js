@@ -113,7 +113,7 @@ export function createGuestApi(storage) {
         save(data)
         return { ok: true }
       }
-      throw fail('Sign in to use this cloud feature.', 401)
+      throw fail('This operation is not available in device storage.', 404)
     } catch (error) {
       if (error instanceof z.ZodError) throw fail(`Check your entry: ${error.issues[0]?.message || 'Invalid value.'}`)
       throw error

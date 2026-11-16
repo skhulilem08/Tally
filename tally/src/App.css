@@ -624,7 +624,7 @@
   -webkit-tap-highlight-color: transparent;
   transition: transform .14s ease;
 }
-.home-toolbar-button:active, .home-action-chip:active, .home-recipe-card:active, .home-assistant-banner:active, .home-grocery-card:active { transform: scale(.98); }
+.home-toolbar-button:active, .home-action-chip:active, .home-recipe-card:active, .home-grocery-card:active { transform: scale(.98); }
 .home-quick-actions {
   display: flex;
   gap: 8px;
@@ -730,24 +730,86 @@
 .home-empty-collection strong { font-size: 14px; font-weight: 620; }
 .home-empty-collection small { color: var(--muted); font-size: 12px; line-height: 1.35; }
 .home-empty-link { display: inline-flex; align-items: center; gap: 4px; min-width: 44px; min-height: 44px; color: var(--accent-ink); text-decoration: none; font-size: 12px; font-weight: 650; white-space: nowrap; }
-.home-assistant-banner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 35%;
-  min-height: 146px;
-  margin: 1px 0 25px;
-  overflow: hidden;
-  border-radius: 24px;
+.home-feature-section, .home-recommendations-section { margin-bottom: 24px; }
+.home-feature-recipe, .home-recommendation-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 70px;
+  padding: 11px 14px;
   background: var(--surface);
   color: var(--text);
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
-  transition: transform .14s ease;
+  transition: transform .14s ease, background-color .14s ease;
 }
-.home-assistant-copy { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; justify-content: center; padding: 14px 11px 14px 16px; }
-.home-assistant-copy > strong { margin-top: 9px; font-size: 17px; line-height: 1.2; font-weight: 650; }
-.home-assistant-copy > small { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.35; }
-.home-assistant-cta { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; margin-top: 8px; color: var(--accent-ink); font-size: 12px; font-weight: 650; }
-.home-assistant-image { display: block; width: 100%; height: 100%; min-height: 146px; object-fit: cover; object-position: center; }
+.home-feature-recipe { border-radius: 22px; }
+.home-feature-recipe:active, .home-recommendation-row:active { transform: scale(.99); }
+.home-feature-copy, .home-recommendation-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+.home-feature-copy strong, .home-recommendation-copy strong {
+  overflow-wrap: anywhere;
+  font-size: 15px;
+  line-height: 1.3;
+  font-weight: 640;
+}
+.home-feature-copy small, .home-recommendation-copy small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.home-recommendation-list {
+  overflow: hidden;
+  border-radius: 22px;
+  background: var(--surface);
+}
+.home-recommendation-row { min-height: 68px; }
+.home-recommendation-row + .home-recommendation-row { border-top: 1px solid var(--line); }
+.home-quiet-empty {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 58px;
+  padding: 15px 14px;
+  border-radius: 20px;
+  background: var(--surface);
+}
+.home-quiet-empty p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.home-empty-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.home-feature-skeleton, .home-recommendations-skeleton {
+  display: grid;
+  gap: 11px;
+  padding: 17px 15px;
+  border-radius: 22px;
+  background: var(--surface);
+}
+.home-feature-skeleton { min-height: 70px; align-content: center; }
+.home-recommendations-skeleton { min-height: 88px; align-content: center; }
+.home-feature-skeleton span, .home-recommendations-skeleton span {
+  display: block;
+  width: 68%;
+  height: 11px;
+  border-radius: 8px;
+  background: var(--inset);
+  animation: pulse 1.15s ease-in-out infinite alternate;
+}
+.home-feature-skeleton span:last-child, .home-recommendations-skeleton span:last-child { width: 42%; }
 .home-groceries-section { margin-top: 0; }
 .home-grocery-card { display: block; padding: 13px 15px 8px; border-radius: 24px; background: var(--surface); color: var(--text); text-decoration: none; -webkit-tap-highlight-color: transparent; transition: transform .14s ease; }
 .home-grocery-card-head { display: flex; align-items: center; gap: 10px; min-height: 47px; }
@@ -783,11 +845,10 @@
   .home-screen-content { padding-right: 16px; padding-left: 16px; }
   .home-recipe-rail { margin-right: -16px; margin-left: -16px; padding-right: 16px; padding-left: 16px; }
   .home-recipe-card, .home-recipe-skeleton { flex-basis: min(82vw, 292px); }
-  .home-assistant-banner { grid-template-columns: minmax(0, 1fr) 32%; }
   .home-grocery-preview { margin-left: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .home-grocery-skeleton span { animation: none; }
+  .home-grocery-skeleton span, .home-feature-skeleton span, .home-recommendations-skeleton span { animation: none; }
 }
 
 /* Cookbook keeps the shared Home/Settings palette with a recipe-card collection layout. */

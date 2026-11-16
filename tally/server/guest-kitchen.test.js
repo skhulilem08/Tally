@@ -81,10 +81,10 @@ test('invalid approvals and corrupt or full storage fail without destroying exis
   assert.equal(values.get(GUEST_STORAGE_KEY), before)
 })
 
-test('separate browsers do not share guest records and cloud-only features never silently fall back', async () => {
+test('separate browsers do not share records and device storage never forwards network operations', async () => {
   const one = setup()
   const two = setup()
   await approveRecipe(one.api)
   assert.equal((await two.api('/bootstrap')).recipes.length, 0)
-  await assert.rejects(one.api('/assistant', { method: 'POST', body: {} }), (error) => error.status === 401)
+  await assert.rejects(one.api('/assistant', { method: 'POST', body: {} }), (error) => error.status === 404)
 })
