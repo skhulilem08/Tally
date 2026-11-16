@@ -208,6 +208,10 @@ The new addendum resolves the earlier screenshot/PDF navigation conflicts: five 
 
 ### Home design
 
+- Home-specific visual reference: `attached_assets/IMG_1984_1794827303234.webp`. The user supplied it to show native Home composition and feel, **not** to adopt its fashion-shopping content. Apply its compact greeting, clear section rhythm, appropriately sized controls and mobile collections to Tally's kitchen content.
+- **User clarification:** Home must use the approved **Settings look, feel and design system**. The Home image guides the **section arrangement**, not a different visual theme. Reuse Settings' solid neutral white/grey/black surfaces, rounded geometry, Hugeicons and control treatment.
+- Use solid filled components without decorative card borders or outlined chips/buttons. Separate surfaces with spacing and contrasting opaque fills; retain meaningful thin row separators and accessible keyboard focus indicators. This is Tally's chosen treatment, not a claim that HIG universally prohibits every kind of outline.
+- The modules come from `tally_specs.md` and its PDF/addendum sources, not from the reference's trending items, shopping categories, offers or notifications. Do not copy those features or the image's device frame/status bar/home indicator.
 - Home is a confirmed native-feeling app destination, not a marketing landing page.
 - Proposed modules are a welcome greeting, Continue cooking/latest recipe, latest grocery list, Talk to your AI, and optional kitchen overview. The exact module selection and wireframe are **not final approved UI**.
 - Treat Continue cooking as a route back to the latest recipe, not evidence of tracked cooking progress.
@@ -227,6 +231,15 @@ The new addendum resolves the earlier screenshot/PDF navigation conflicts: five 
 - Use real buttons, links, labels, headings, lists, and form controls rather than clickable generic containers.
 - Responsive web layouts must work on phones, tablets, and desktop without horizontal scrolling or fake device frames.
 - Installation hints must match the browser and appear only when relevant. Do not promise universal browser install prompts, background recording, or native haptics.
+
+### Buttons, links and action hierarchy
+
+- Apple HIG recommends a prominent style for the most likely action, generally limiting prominent buttons to one or two per view. Use style rather than inconsistent sizes to distinguish actions. Do not make every navigation link a competing primary button. [A8]
+- For Home, **Add recipe** is the primary filled quick action; planning groceries and opening the assistant remain secondary. Collection destinations use quiet labelled controls and chevrons. Recipe/list cards are tappable as a whole.
+- Text-only secondary navigation is compatible with a native interface. Avoid underlined website-link styling, but do not add an unnecessary filled pill around every label.
+- Keep the chosen 44 × 44 CSS px hit areas, clear action labels, adequate spacing and a visible pressed state on every interactive control, including quiet text links. Retain keyboard focus indicators and meaningful accessible names for icon-only controls. [A3, A8]
+- In this web implementation, retain real router links for navigation and real buttons for actions, form submission and sheet presentation. Appearance alone does not change a control's semantics; do not replace links with JavaScript-only click handlers to imitate native controls.
+- Loading and disabled treatments must reflect actual state, and destructive actions must not receive primary/default emphasis. Continue using solid opaque surfaces without decorative outlines or Liquid Glass. [A8]
 
 ### Native screen sections: structure and separation
 

@@ -33,6 +33,24 @@ Preserve the approved Settings direction, with rounder corners and more solid wh
 
 **How to apply:** Refine rather than replace the Settings layout. Keep opaque neutral light/dark surfaces and the no-glass constraint.
 
+Use Settings' approved visual system for Home, and the Home screenshot only for section arrangement—not product sections or a different theme.
+
+**Why:** The user directed Home content back to the PDF-derived specs, then corrected the interpretation: “the look and feel and design must match setting as for section structure match the img i sent you”.
+
+**How to apply:** Reuse Settings' palette, rounded solid surfaces, icons and control treatment. Follow the Home image for the arrangement of real greeting/recipe/list/assistant content from the specs. Do not introduce ecommerce features or redesign Settings.
+
+Preserve the accepted native Home composition while refining its controls.
+
+**Why:** The user explicitly said, “i like the native home design”, then asked for the links and buttons to follow HIG guidance.
+
+**How to apply:** Keep the layout and shared Settings visual language; refine action hierarchy, navigation affordances, labels, hit areas and interaction states rather than redesigning Home again.
+
+Use solid filled components, not decorative outlined cards or controls.
+
+**Why:** The user explicitly instructed, “No outline ... on component as they are solid”.
+
+**How to apply:** Avoid decorative card borders and outlined chips/buttons. Keep the approved native row separators and accessible keyboard focus indicators, which serve different purposes.
+
 Use Apple HIG as Tally's primary design reference, with solid-colour, iOS 7+ inspired design and no Liquid Glass.
 
 **Why:** The user stated, “Hig is our primary ref for design skills”, requested Apple design principles, clarified “7+”, and specified “solid color not Liquid Glass”. They also clarified that the attached images are part of the native look-and-feel reference and design guide.

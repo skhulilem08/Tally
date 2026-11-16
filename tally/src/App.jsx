@@ -227,14 +227,15 @@ function AppShell({ children }) {
     if (window.history.length > 1) window.history.back()
     else setLocation(backPath)
   }
+  const isHome = location === '/' || location === '/home'
   return (
-    <div className={`app-shell ${location === '/settings' ? 'settings-shell' : ''}`}>
-      <header className="topbar">
+    <div className={`app-shell ${location === '/settings' ? 'settings-shell' : ''} ${isHome ? 'home-shell' : ''}`}>
+      {!isHome && <header className="topbar">
         {isDetail ? <button className="back-button" type="button" onClick={goBack} aria-label="Go back" title="Go back"><ArrowLeft size={21} /></button> : <div className="brand-lockup"><span className="brand-mark"><CookingPot size={18} /></span><span>Tally</span></div>}
         <span className="topbar-context">{isDetail ? current.label : 'Your kitchen, kept close'}</span>
         <div className={`topbar-side ${online ? '' : 'offline-indicator'}`}>{online ? 'Personal cookbook' : 'Offline · may not sync'}</div>
-      </header>
-      <main className="screen-content" key={current.href}>{children}</main>
+      </header>}
+      <main className={`screen-content ${isHome ? 'home-screen-content' : ''}`} key={current.href}>{children}</main>
       <nav className="tabbar" aria-label="Main navigation">
         {tabs.map(({ href, label, Icon }, index) => {
           const selected = location === href || (href === '/home' && location === '/') || (href !== '/home' && location.startsWith(href))
@@ -260,29 +261,104 @@ function SignInPrompt({ title = 'Your kitchen is yours', children = 'Sign in to 
 }
 
 function Home({ kitchen, isSignedIn, canUseKitchen, user }) {
-  const latestRecipe = kitchen.recipes[0]
+  const recentRecipes = kitchen.recipes.slice(0, 3)
   const latestList = kitchen.lists[0]
-  const firstName = user?.firstName || 'there'
+  const firstName = user?.firstName
+  const [hour] = useState(() => new Date().getHours())
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
   return (
     <div className="page home-page">
-      <section className="home-intro">
-        <div className="intro-copy"><p className="eyebrow">A little more at home</p><h1>Good to have<br />you here<span className="orange-period">.</span></h1><p className="intro-greeting">{isSignedIn ? `Welcome back, ${firstName}. What are we making?` : 'The recipes you know by heart, and the ones you’re learning.'}</p></div>
-        <div className="home-still" role="img" aria-label="Fresh herbs, citrus and salt on a sunlit kitchen counter"><img src={`${basePath}/kitchen-still-life.jpg`} alt="" /></div>
+      <header className="home-greeting">
+        <h1>{greeting}{firstName ? `, ${firstName}` : ''}</h1>
+        <div className="home-toolbar" aria-label="Kitchen collections">
+          <Link href="/cookbook" className="home-toolbar-button" aria-label="Open cookbook" title="Cookbook" data-testid="home-open-cookbook"><BookOpen size={19} /></Link>
+          <Link href="/groceries" className="home-toolbar-button" aria-label="Open grocery lists" title="Groceries" data-testid="home-open-groceries"><ShoppingBasket size={19} /></Link>
+        </div>
+      </header>
+
+      <nav className="home-quick-actions" aria-label="Kitchen actions">
+        <Link href="/cookbook/new" className="home-action-chip home-action-primary" data-testid="home-add-recipe"><Plus size={17} />Add recipe</Link>
+        <Link href="/groceries/plan" className="home-action-chip" data-testid="home-plan-groceries"><ListChecks size={17} />Plan groceries</Link>
+        <Link href={isSignedIn ? '/assistant' : '/sign-in'} className="home-action-chip" aria-label={isSignedIn ? 'Ask Tally' : 'Sign in to ask Tally'} data-testid="home-ask-tally"><Sparkles size={17} />Ask Tally</Link>
+      </nav>
+
+      <ErrorNotice onRetry={kitchen.reload}>{kitchen.error}</ErrorNotice>
+
+      <section className="home-section home-recipes-section" aria-labelledby="home-recipe-heading">
+        <div className="home-section-heading">
+          <h2 id="home-recipe-heading">Recent recipes</h2>
+          <Link href="/cookbook" className="home-section-link">Cookbook<ChevronRight size={16} /></Link>
+        </div>
+        {!canUseKitchen || kitchen.loading
+          ? <div className="home-recipe-rail" aria-label="Loading recent recipes"><div className="home-recipe-skeleton" /><div className="home-recipe-skeleton" /></div>
+          : recentRecipes.length
+            ? <div className="home-recipe-rail" aria-label="Recent saved recipes">
+                {recentRecipes.map((recipe, index) => {
+                  const ingredients = (recipe.ingredients || []).filter((item) => item.name?.trim())
+                  return <Link key={recipe.id} className="home-recipe-card" href={`/cookbook/${recipe.id}`} data-testid={`home-recipe-${recipe.id}`}>
+                    <div className="home-card-topline">
+                      <span className="home-icon-badge"><BookOpen size={18} /></span>
+                      <span className="home-card-rank">{index === 0 ? 'Latest recipe' : 'Saved recipe'}</span>
+                      <ChevronRight size={18} className="home-card-chevron" />
+                    </div>
+                    <strong className="home-recipe-title">{recipe.title}</strong>
+                    <span className="home-recipe-serving">{recipe.servings} servings{recipe.prepMinutes != null ? ` · ${recipe.prepMinutes} min prep` : ''}</span>
+                    {!!ingredients.length && <span className="home-ingredient-preview">
+                      <span className="home-preview-label">Ingredients</span>
+                      <span className="home-ingredient-names">{ingredients.slice(0, 3).map((item) => item.name).join(' · ')}</span>
+                    </span>}
+                  </Link>
+                })}
+              </div>
+            : <div className="home-empty-collection">
+                <span className="home-icon-badge"><BookOpen size={18} /></span>
+                <span><strong>No saved recipes yet</strong><small>Add a recipe to start your cookbook.</small></span>
+                <Link href="/cookbook/new" className="home-empty-link">Add recipe<ArrowRight size={16} /></Link>
+              </div>}
       </section>
-      {!canUseKitchen ? <LoadingRows /> : (
-        <>
-          <ErrorNotice onRetry={kitchen.reload}>{kitchen.error}</ErrorNotice>
-          <section className="home-next">
-            <div className="section-heading"><div><p className="eyebrow">Pick up where you left off</p><h2>Your kitchen</h2></div><span className="tiny-kitchen-mark"><CookingPot size={18} /></span></div>
-            {kitchen.loading ? <LoadingRows /> : <div className="home-tiles">
-              {latestRecipe ? <Link className="home-tile recipe-tile" href={`/cookbook/${latestRecipe.id}`}><span className="tile-symbol orange-symbol"><BookOpen size={20} /></span><span className="tile-content"><span className="tile-label">Latest recipe</span><strong>{latestRecipe.title}</strong><small>{latestRecipe.servings} servings · added {dateLabel(latestRecipe.createdAt)}</small></span><ChevronRight size={19} /></Link> : <Link className="home-tile recipe-tile" href="/cookbook/new"><span className="tile-symbol orange-symbol"><Plus size={20} /></span><span className="tile-content"><span className="tile-label">Your cookbook</span><strong>Save a recipe you love</strong><small>Begin with a familiar favourite</small></span><ChevronRight size={19} /></Link>}
-              {latestList ? <Link className="home-tile list-tile" href={`/groceries/${latestList.id}`}><span className="tile-symbol pink-symbol"><ShoppingBasket size={20} /></span><span className="tile-content"><span className="tile-label">Latest grocery list</span><strong>{latestList.name}</strong><small>{latestList.items?.filter((item) => item.checked).length || 0} of {latestList.items?.length || 0} in your cart</small></span><ChevronRight size={19} /></Link> : <Link className="home-tile list-tile" href="/groceries"><span className="tile-symbol pink-symbol"><ListChecks size={20} /></span><span className="tile-content"><span className="tile-label">Shopping, made simpler</span><strong>Plan a grocery list</strong><small>Choose recipes when you’re ready</small></span><ChevronRight size={19} /></Link>}
-            </div>}
-          </section>
-          <Link href="/assistant" className="assistant-invite"><span className="assistant-orbit"><Sparkles size={22} /></span><span><small>Need a hand?</small><strong>Talk it through with Tally</strong><em>Text chat, whenever you’re ready</em></span><ArrowRight size={19} /></Link>
-        </>
-      )}
-      <p className="home-footnote">Made for the food you actually make.</p>
+
+      <Link href={isSignedIn ? '/assistant' : '/sign-in'} className="home-assistant-banner" aria-label={isSignedIn ? 'Open Tally AI Assistant' : 'Sign in to use Tally AI Assistant'} data-testid="home-assistant-link">
+        <span className="home-assistant-copy">
+          <span className="home-icon-badge"><Sparkles size={18} /></span>
+          <strong>{isSignedIn ? 'Talk to Tally' : 'AI Assistant'}</strong>
+          <small>{isSignedIn ? 'Ask about a recipe or a plan.' : 'Sign in to start a conversation.'}</small>
+          <span className="home-assistant-cta">{isSignedIn ? 'Open assistant' : 'Sign in'}<ArrowRight size={16} /></span>
+        </span>
+        <img className="home-assistant-image" src={`${basePath}/kitchen-still-life.jpg`} alt="" />
+      </Link>
+
+      <section className="home-section home-groceries-section" aria-labelledby="home-grocery-heading">
+        <div className="home-section-heading">
+          <h2 id="home-grocery-heading">Latest grocery list</h2>
+          <Link href="/groceries" className="home-section-link">All lists<ChevronRight size={16} /></Link>
+        </div>
+        {!canUseKitchen || kitchen.loading
+          ? <div className="home-grocery-skeleton" aria-label="Loading latest grocery list"><span /><span /><span /></div>
+          : latestList
+            ? <Link className="home-grocery-card" href={`/groceries/${latestList.id}`} data-testid={`home-list-${latestList.id}`}>
+                <div className="home-grocery-card-head">
+                  <span className="home-icon-badge"><ShoppingBasket size={18} /></span>
+                  <span className="home-grocery-title"><strong>{latestList.name}</strong><small>{latestList.items?.length || 0} items</small></span>
+                  <span className="home-grocery-progress">{latestList.items?.filter((item) => item.checked).length || 0}<small>in cart</small></span>
+                  <ChevronRight size={18} className="home-card-chevron" />
+                </div>
+                {latestList.items?.length > 0
+                  ? <ul className="home-grocery-preview">
+                      {latestList.items.slice(0, 3).map((item) => <li key={item.id}>
+                        <span>{item.name}</span>
+                        {(item.amount || item.unit) && <small>{[item.amount, item.unit].filter(Boolean).join(' ')}</small>}
+                        {item.checked && <small className="home-grocery-item-status">In cart</small>}
+                      </li>)}
+                      {latestList.items.length > 3 && <li className="home-grocery-more">+{latestList.items.length - 3} more items</li>}
+                    </ul>
+                  : <p className="home-list-empty-copy">No items in this list yet.</p>}
+              </Link>
+            : <div className="home-empty-collection">
+                <span className="home-icon-badge"><ShoppingBasket size={18} /></span>
+                <span><strong>No grocery list yet</strong><small>Plan one when you’re ready.</small></span>
+                <Link href="/groceries/plan" className="home-empty-link">Plan groceries<ArrowRight size={16} /></Link>
+              </div>}
+      </section>
     </div>
   )
 }

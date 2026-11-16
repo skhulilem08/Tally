@@ -121,6 +121,8 @@ PWA installation must use a valid manifest, suitable icons, secure hosting, and 
 
 The addendum's Home wireframe is illustrative, not final UI. If a proposed module is adopted, supply honest no-recipe/no-list states rather than sample personal activity presented as real.
 
+**Home visual reference:** the user supplied `attached_assets/IMG_1984_1794827303234.webp` for the native **section arrangement**, explicitly **not its ecommerce sections**. The user clarified that Home's **look, feel and visual system must match the approved Settings design**, not introduce a new theme. Use the kitchen modules above, solid filled components without decorative outlines, and the interpretation in `ui_design_skill.md`; preserve Settings itself.
+
 ## 5. Cookbook
 
 ### Confirmed behaviour
