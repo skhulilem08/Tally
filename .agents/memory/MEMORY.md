@@ -1,1 +1,2 @@
 - [Project requirements](project-requirements.md) — JavaScript/PWA delivery, strict native feel, Apple HIG as primary design reference, solid colours without Liquid Glass, and five tabs.
+- [Preview routing](preview-routing.md) — Workflow management can regenerate legacy forwarding; validate the public preview proxy, not localhost alone.
