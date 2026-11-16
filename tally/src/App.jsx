@@ -313,7 +313,7 @@ function Home({ kitchen, isSignedIn, canUseKitchen, user }) {
             : <div className="home-empty-collection">
                 <span className="home-icon-badge"><BookOpen size={18} /></span>
                 <span><strong>No saved recipes yet</strong><small>Add a recipe to start your cookbook.</small></span>
-                <Link href="/cookbook/new" className="home-empty-link">Add recipe<ArrowRight size={16} /></Link>
+                <Link href="/cookbook/new" className="home-empty-link">Add recipe<ChevronRight size={16} /></Link>
               </div>}
       </section>
 
@@ -322,7 +322,7 @@ function Home({ kitchen, isSignedIn, canUseKitchen, user }) {
           <span className="home-icon-badge"><Sparkles size={18} /></span>
           <strong>{isSignedIn ? 'Talk to Tally' : 'AI Assistant'}</strong>
           <small>{isSignedIn ? 'Ask about a recipe or a plan.' : 'Sign in to start a conversation.'}</small>
-          <span className="home-assistant-cta">{isSignedIn ? 'Open assistant' : 'Sign in'}<ArrowRight size={16} /></span>
+          <span className="home-assistant-cta">{isSignedIn ? 'Open assistant' : 'Sign in'}<ChevronRight size={16} /></span>
         </span>
         <img className="home-assistant-image" src={`${basePath}/kitchen-still-life.jpg`} alt="" />
       </Link>
@@ -356,7 +356,7 @@ function Home({ kitchen, isSignedIn, canUseKitchen, user }) {
             : <div className="home-empty-collection">
                 <span className="home-icon-badge"><ShoppingBasket size={18} /></span>
                 <span><strong>No grocery list yet</strong><small>Plan one when you’re ready.</small></span>
-                <Link href="/groceries/plan" className="home-empty-link">Plan groceries<ArrowRight size={16} /></Link>
+                <Link href="/groceries/plan" className="home-empty-link">Plan groceries<ChevronRight size={16} /></Link>
               </div>}
       </section>
     </div>

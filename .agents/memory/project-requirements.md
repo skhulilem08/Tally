@@ -45,6 +45,12 @@ Preserve the accepted native Home composition while refining its controls.
 
 **How to apply:** Keep the layout and shared Settings visual language; refine action hierarchy, navigation affordances, labels, hit areas and interaction states rather than redesigning Home again.
 
+Use the small Cookbook/All lists chevrons consistently for Home navigation labels, not straight arrows.
+
+**Why:** The user preferred those chevrons over the arrows beside Sign in, Add recipe and Plan groceries.
+
+**How to apply:** Keep these navigation affordances in the shared Hugeicons family without changing their destinations or the accepted Home layout.
+
 Use solid filled components, not decorative outlined cards or controls.
 
 **Why:** The user explicitly instructed, “No outline ... on component as they are solid”.
