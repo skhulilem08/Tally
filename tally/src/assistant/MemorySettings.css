@@ -1,0 +1,80 @@
+.memory-settings { color: var(--text); }
+.memory-settings-toggle { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 68px; padding: 8px 1px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.memory-settings-toggle > span { display: grid; gap: 4px; }
+.memory-settings-toggle strong { font-size: 14px; font-weight: 650; }
+.memory-settings-toggle small { max-width: 290px; color: var(--muted); font-size: 12px; line-height: 1.4; }
+.memory-settings-toggle input { width: 42px; height: 25px; margin: 0; accent-color: var(--accent); flex: 0 0 auto; }
+.memory-settings-section { padding: 16px 0 7px; }
+.memory-settings-subhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.memory-settings-subhead h3 { margin: 0; font-size: 15px; font-weight: 670; }
+.memory-settings-subhead > span { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.memory-settings-list { list-style: none; margin: 0; padding: 0; }
+.memory-settings-list li { display: grid; grid-template-columns: minmax(95px, .65fr) minmax(0, 1fr); gap: 12px; padding: 11px 1px; border-bottom: 1px solid var(--line); font-size: 13px; line-height: 1.4; }
+.memory-settings-list li strong { font-weight: 620; overflow-wrap: anywhere; }
+.memory-settings-list li span { color: var(--muted); white-space: pre-wrap; overflow-wrap: anywhere; }
+.memory-settings-narrative { margin: 0 0 10px; font-size: 14px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.memory-settings-empty { margin: 0; padding: 12px 1px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+.memory-settings-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 13px; }
+.memory-settings-actions-wrap { flex-wrap: wrap; }
+.memory-settings-secondary,
+.memory-settings-primary,
+.memory-settings-danger {
+  min-height: 42px;
+  padding: 9px 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 0;
+  border-radius: 13px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.memory-settings-secondary { background: var(--inset); color: var(--text); }
+.memory-settings-primary { background: var(--accent); color: var(--on-accent); }
+.memory-settings-danger { width: 100%; background: var(--danger); color: var(--surface); }
+.memory-settings-secondary:disabled,
+.memory-settings-primary:disabled,
+.memory-settings-danger:disabled { opacity: .55; cursor: not-allowed; }
+.memory-settings-danger-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line); }
+.memory-settings-danger-text { min-height: 40px; padding: 7px 5px; border: 0; background: transparent; color: var(--danger); font: inherit; font-size: 12px; font-weight: 640; cursor: pointer; }
+.memory-settings-danger-text:hover { background: var(--inset); border-radius: 10px; }
+.memory-settings-footnote { margin: 12px 1px 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
+.memory-settings-error,
+.memory-settings-notice { margin: 0 0 10px; padding: 10px 12px; border-radius: 12px; font-size: 13px; line-height: 1.4; }
+.memory-settings-error { background: var(--pink-soft); color: var(--danger); }
+.memory-settings-notice { display: flex; align-items: flex-start; gap: 7px; background: color-mix(in srgb, var(--success) 13%, var(--surface)); color: var(--success); }
+.memory-settings-notice svg { flex: 0 0 auto; }
+.memory-settings-form { display: grid; gap: 11px; padding-top: 14px; }
+.memory-settings-field { display: grid; gap: 6px; font-size: 13px; font-weight: 640; }
+.memory-settings-field textarea,
+.memory-settings-fact input { width: 100%; min-height: 45px; border: 0; border-radius: 12px; padding: 10px 11px; background: var(--inset); color: var(--text); font: inherit; font-size: 14px; font-weight: 430; line-height: 1.45; resize: vertical; }
+.memory-settings-field textarea { min-height: 90px; }
+.memory-settings-fact { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr) 34px; gap: 6px; align-items: center; }
+.memory-settings-fact input { min-width: 0; }
+.memory-settings-icon-action { width: 34px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; }
+.memory-settings-icon-action:hover { background: var(--inset); }
+.memory-settings-text-action { justify-self: start; min-height: 40px; padding: 7px 6px; display: inline-flex; align-items: center; gap: 6px; border: 0; border-radius: 10px; background: transparent; color: var(--accent-ink); font: inherit; font-size: 13px; font-weight: 640; cursor: pointer; }
+.memory-settings-text-action:hover { background: var(--inset); }
+.memory-settings-confirm { margin-top: 14px; padding: 15px; border-radius: 17px; background: var(--pink-soft); }
+.memory-settings-overline { color: var(--danger); font-size: 10px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+.memory-settings-confirm h3 { margin: 5px 0; font-size: 17px; }
+.memory-settings-confirm p { margin: 0 0 13px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+.memory-settings-cancel { width: 100%; margin-top: 7px; }
+.memory-settings-skeleton { display: grid; gap: 9px; padding: 14px 0; }
+.memory-settings-skeleton span { height: 42px; border-radius: 12px; background: var(--inset); animation: memory-skeleton .95s ease-in-out infinite alternate; }
+.memory-settings-skeleton span:nth-child(2) { width: 84%; }
+.memory-settings-skeleton span:nth-child(3) { width: 68%; }
+@keyframes memory-skeleton { to { opacity: .48; } }
+.memory-settings-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.memory-settings button:focus-visible,
+.memory-settings input:focus-visible,
+.memory-settings textarea:focus-visible { outline: 3px solid var(--outline); outline-offset: 3px; }
+
+@media (max-width: 440px) {
+  .memory-settings-actions-wrap { justify-content: stretch; }
+  .memory-settings-actions-wrap button { flex: 1; }
+  .memory-settings-fact { grid-template-columns: minmax(0, .8fr) minmax(0, 1.1fr) 30px; gap: 4px; }
+}

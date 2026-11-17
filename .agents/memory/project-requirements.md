@@ -127,7 +127,7 @@ AI Assistant's signature interaction is a live voice call with updating recipe a
 
 **Why:** The user reiterated the original PDF's call-like requirement and explained that they want to talk through adjustments while structured components update without ending the conversation.
 
-**How to apply:** Preserve text as a fallback, explicit approval before recipe/list saves, and guest access. Do not describe text chat or record-and-send voice messages as completion of the live-call requirement. Move the recent recipe/Cookbook and recent list/Groceries shortcuts to opposite ends of the centered Assistant header as icons rather than side-by-side cards.
+**How to apply:** Preserve readable transcripts, explicit approval before recipe/list saves, and guest access. The user's later correction removes the general typed-message composer. Do not describe text chat or record-and-send voice messages as completion of the live-call requirement. Move the recent recipe/Cookbook and recent list/Groceries shortcuts to opposite ends of the centered Assistant header as icons rather than side-by-side cards.
 
 If Replit's AI connection lacks a native live-call API, implement an automatic speech-to-text → Replit OpenAI → text-to-speech conversation instead.
 
@@ -140,6 +140,18 @@ Show recognized user speech in user message bubbles, with a correction path for 
 **Why:** The user explicitly wants to see what the speech feature heard so they can notice words they did not actually say.
 
 **How to apply:** Show actual recognition output, not an AI-cleaned paraphrase. Make corrections update the working conversation/draft and reject stale replies; keep automatic saving prohibited. Only show provisional transcription if the provider actually supplies it.
+
+Assistant must have no general typing input and minimal explanatory text; its header and manual entry must match the approved Settings, Home, Cookbook and Groceries design.
+
+**Why:** The user explicitly removed the typing input and repeatedly corrected inconsistent, non-native Assistant/manual presentation, especially the header and card-like choice screen.
+
+**How to apply:** Use opposite header shortcut icons and a centered title. Manual entry begins with full-width New recipe and New grocery list buttons, not cards, followed by native wizard controls and full-width continuation/save actions. In Settings choose visible mode switch, long press or both; Assistant memory opens within Settings, never by navigating to Assistant.
+
+Light-mode icons on orange-filled backgrounds must be white, and touch/mouse interactions must not show browser-style square focus boxes.
+
+**Why:** The user explicitly requested both consistency corrections across the app.
+
+**How to apply:** Separate icon foreground from button-label contrast; keep the approved dark gold untouched. Suppress tap/pointer boxes while retaining an accessible rounded keyboard-only focus indication.
 
 The product assistant needs a private, self-maintained `memory.md` per user, combining a general-facts table with narrative summaries of preferences and situational cooking habits.
 

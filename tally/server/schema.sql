@@ -1,3 +1,11 @@
+CREATE TABLE IF NOT EXISTS tally_assistant_states (
+  owner_id text PRIMARY KEY,
+  revision integer NOT NULL CHECK (revision > 0),
+  data jsonb NOT NULL,
+  memory_markdown text NOT NULL,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS tally_recipes (
   id uuid PRIMARY KEY,
   owner_id text NOT NULL,

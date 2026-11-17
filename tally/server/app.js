@@ -15,6 +15,7 @@ import { approvalSchema, recipeSchema, planSchema, listApprovalSchema } from './
 import { calculateGroceries } from './groceries.js'
 import { createAssistantRouter } from './assistant-route.js'
 import { requireSameOrigin } from './request-origin.js'
+import { manualListSchema, manualListData } from '../shared/manual-list.js'
 
 export const app = express()
 app.disable('x-powered-by')
@@ -110,6 +111,16 @@ router.post('/groceries/preview', async (req, res) => {
   const { selections, inventory } = planSchema.parse(req.body)
   const recipes = await ownerRecipes(req.ownerId, selections.map((row) => row.recipeId))
   res.json(calculateGroceries(recipes, selections, inventory))
+})
+
+router.post('/lists/manual', async (req, res) => {
+  const input = manualListSchema.parse(req.body)
+  const result = await pool.query(
+    `INSERT INTO tally_grocery_lists(id, owner_id, request_id, data) VALUES($1, $2, $3, $4)
+     ON CONFLICT(owner_id, request_id) DO UPDATE SET request_id = EXCLUDED.request_id RETURNING *`,
+    [randomUUID(), req.ownerId, input.requestId, JSON.stringify(manualListData(input, randomUUID))],
+  )
+  res.status(201).json(record(result.rows[0]))
 })
 
 router.post('/groceries/approve', async (req, res) => {

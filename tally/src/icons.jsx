@@ -25,6 +25,7 @@ import Moon02Icon from '@hugeicons/core-free-icons/Moon02Icon'
 import Delete02Icon from '@hugeicons/core-free-icons/Delete02Icon'
 import UserCircleIcon from '@hugeicons/core-free-icons/UserCircleIcon'
 import Cancel01Icon from '@hugeicons/core-free-icons/Cancel01Icon'
+import FingerAccessIcon from '@hugeicons/core-free-icons/FingerAccessIcon'
 
 // One shared Hugeicons Stroke Rounded family for every interface glyph.
 // Semantic aliases keep the screens independent of a library's naming scheme.
@@ -74,3 +75,4 @@ export const Moon = icon(Moon02Icon)
 export const Trash2 = icon(Delete02Icon)
 export const UserRound = icon(UserCircleIcon)
 export const X = icon(Cancel01Icon)
+export const FingerAccess = icon(FingerAccessIcon)

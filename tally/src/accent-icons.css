@@ -1,0 +1,14 @@
+/* Filled accent controls share one icon foreground token. Text keeps its
+   independent, higher-contrast foreground; dark gold remains unchanged. */
+:is(
+  .brand-mark, .accent-icon, .tab-assistant .tab-icon,
+  .button-primary, .send-button, .home-action-primary,
+  .cookbook-add-button, .groceries-add-button,
+  .grocery-item.checked .check-control,
+  .recipe-select-label input:checked + .selection-check,
+  .assistant-voice-start, .assistant-inline-primary,
+  .assistant-call-control[aria-pressed="true"], .assistant-welcome-mark,
+  .assistant-send, .manual-primary-action
+) svg {
+  color: var(--on-accent-icon);
+}

@@ -5,17 +5,18 @@ import { publishableKeyFromHost } from '@clerk/react/internal'
 import { shadcn } from '@clerk/themes'
 import { Redirect, Route, Router as WouterRouter, Switch, Link, useLocation } from 'wouter'
 import {
-  ArrowLeft, ArrowRight, BookOpen, Check, CheckCircle2, ChevronRight,
+  ArrowLeft, ArrowRight, BookOpen, Check, ChevronRight,
   CircleHelp, Clock3, CookingPot, House, ListChecks, LoaderCircle, LogOut,
-  MoreHorizontal, Plus, Search, Send, Settings as SettingsIcon,
-  ShoppingBasket, Sparkles, Sun, Trash2, UserRound, X,
+  MoreHorizontal, Plus, Search, Settings as SettingsIcon,
+  FingerAccess, ShoppingBasket, Sparkles, Sun, Trash2, UserRound, X,
 } from './icons.jsx'
-import { api } from './api.js'
+import { useAssistantControls } from './assistant/preferences.js'
 import { useKitchenData } from './useKitchenData.js'
 import { useRecipeRecommendations } from './useRecipeRecommendations.js'
 import { recordRecipeOpen, RECIPE_ACTIVITY_EVENT } from './recipeActivity.js'
+import AssistantPage from './assistant/AssistantPage.jsx'
+import MemorySettings from './assistant/MemorySettings.jsx'
 import './App.css'
-import './assistant.css'
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '')
 const clerkPubKey = publishableKeyFromHost(window.location.hostname, import.meta.env.VITE_CLERK_PUBLISHABLE_KEY)
@@ -28,32 +29,6 @@ const emptyRecipe = () => ({
 })
 const idForRequest = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`
 const dateLabel = (value) => value ? new Date(value).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) : ''
-const assistantDraftPayload = (draft) => {
-  if (!draft) return null
-  const servings = Number(draft.servings)
-  const ingredients = (draft.ingredients || []).map((item) => ({
-    name: String(item.name || '').trim(),
-    amount: Number(item.amount),
-    unit: String(item.unit || '').trim(),
-  }))
-  const steps = (draft.steps || []).map((step) => String(step).trim()).filter(Boolean)
-  if (!String(draft.title || '').trim() || !Number.isFinite(servings) || servings <= 0 ||
-      !ingredients.length || ingredients.some((item) => !item.name || !Number.isFinite(item.amount) || item.amount <= 0 || !item.unit) || !steps.length) return null
-  const prepMinutes = draft.prepMinutes == null || draft.prepMinutes === '' ? null : Number(draft.prepMinutes)
-  const cookMinutes = draft.cookMinutes == null || draft.cookMinutes === '' ? null : Number(draft.cookMinutes)
-  if ([prepMinutes, cookMinutes].some((value) => value !== null && (!Number.isFinite(value) || value < 0))) return null
-  return {
-    title: String(draft.title).trim(),
-    description: String(draft.description || '').trim(),
-    servings,
-    prepMinutes,
-    cookMinutes,
-    ingredients,
-    steps,
-    notes: String(draft.notes || '').trim(),
-  }
-}
-
 function StripBase(path) {
   return basePath && path.startsWith(basePath) ? path.slice(basePath.length) || '/' : path
 }
@@ -184,9 +159,13 @@ const tabs = [
 
 function AppShell({ children }) {
   const [location, setLocation] = useLocation()
+  const [assistantControls] = useAssistantControls()
   const [online, setOnline] = useState(() => navigator.onLine)
+  const [assistantMode, setAssistantMode] = useState('chat')
   const previousLocation = useRef(location)
   const restoredLocation = useRef(false)
+  const assistantLongPressTimer = useRef(null)
+  const assistantLongPressTriggered = useRef(false)
   const activePath = location === '/' ? '/home' : location
   const current = tabs.find((tab) => activePath.startsWith(tab.href)) || tabs[0]
   const isDetail = /\/(cookbook\/[^/]+|groceries\/[^/]+|settings\/account)$/.test(location) || location.endsWith('/new') || location.endsWith('/edit') || location.endsWith('/plan')
@@ -196,6 +175,14 @@ function AppShell({ children }) {
     window.addEventListener('online', update)
     window.addEventListener('offline', update)
     return () => { window.removeEventListener('online', update); window.removeEventListener('offline', update) }
+  }, [])
+  useEffect(() => {
+    const updateAssistantMode = (event) => setAssistantMode(event.detail?.mode === 'manual' ? 'manual' : 'chat')
+    window.addEventListener('tally:assistant-mode', updateAssistantMode)
+    return () => window.removeEventListener('tally:assistant-mode', updateAssistantMode)
+  }, [])
+  useEffect(() => () => {
+    if (assistantLongPressTimer.current) window.clearTimeout(assistantLongPressTimer.current)
   }, [])
   useEffect(() => {
     const saveScroll = () => routeScrollPositions.set(location, window.scrollY)
@@ -233,19 +220,54 @@ function AppShell({ children }) {
   }
   const isHome = location === '/' || location === '/home'
   const isGroceries = location === '/groceries'
+  const isAssistant = location === '/assistant'
   return (
-    <div className={`app-shell ${location === '/settings' ? 'settings-shell' : ''} ${isHome ? 'home-shell' : ''} ${location === '/cookbook' ? 'cookbook-shell' : ''} ${isGroceries ? 'groceries-shell' : ''} ${location === '/assistant' ? 'assistant-shell' : ''}`}>
-      {!isHome && location !== '/cookbook' && !isGroceries && <header className="topbar">
+    <div className={`app-shell ${location === '/settings' ? 'settings-shell' : ''} ${isHome ? 'home-shell' : ''} ${location === '/cookbook' ? 'cookbook-shell' : ''} ${isGroceries ? 'groceries-shell' : ''} ${isAssistant ? 'assistant-shell' : ''}`}>
+      {!isHome && location !== '/cookbook' && !isGroceries && !isAssistant && <header className="topbar">
         {isDetail ? <button className="back-button" type="button" onClick={goBack} aria-label="Go back" title="Go back"><ArrowLeft size={21} /></button> : <div className="brand-lockup"><span className="brand-mark"><CookingPot size={18} /></span><span>Tally</span></div>}
         <span className="topbar-context">{isDetail ? current.label : 'Your kitchen, kept close'}</span>
         <div className={`topbar-side ${online ? '' : 'offline-indicator'}`}>{online ? 'Personal cookbook' : 'Offline · may not sync'}</div>
       </header>}
-      <main className={`screen-content ${isHome ? 'home-screen-content' : ''} ${location === '/cookbook' ? 'cookbook-screen-content' : ''} ${isGroceries ? 'groceries-screen-content' : ''} ${location === '/assistant' ? 'assistant-screen-content' : ''}`} key={current.href}>{children}</main>
+      <main className={`screen-content ${isHome ? 'home-screen-content' : ''} ${location === '/cookbook' ? 'cookbook-screen-content' : ''} ${isGroceries ? 'groceries-screen-content' : ''} ${isAssistant ? 'assistant-screen-content' : ''}`} key={current.href}>{children}</main>
       <nav className="tabbar" aria-label="Main navigation">
         {tabs.map(({ href, label, Icon }, index) => {
           const selected = location === href || (href === '/home' && location === '/') || (href !== '/home' && location.startsWith(href))
-          return <Link key={href} href={href} className={`tab-item ${selected ? 'selected' : ''} ${index === 2 ? 'tab-assistant' : ''}`} aria-current={selected ? 'page' : undefined} data-testid={`tab-${label.toLowerCase().replace(' ', '-')}`}>
-            <span className="tab-icon"><Icon size={index === 2 ? 22 : 20} strokeWidth={selected || index === 2 ? 1.8 : 1.5} /></span><span className="tab-label">{label}</span>
+          const TabIcon = index === 2 && assistantMode === 'manual' ? FingerAccess : Icon
+          const canLongPress = index === 2 && (assistantControls === 'longpress' || assistantControls === 'both')
+          const clearLongPress = () => {
+            if (assistantLongPressTimer.current) window.clearTimeout(assistantLongPressTimer.current)
+            assistantLongPressTimer.current = null
+          }
+          return <Link
+            key={href}
+            href={href}
+            className={`tab-item ${selected ? 'selected' : ''} ${index === 2 ? 'tab-assistant' : ''}`}
+            aria-current={selected ? 'page' : undefined}
+            aria-label={index === 2 ? (canLongPress ? 'Assistant. Press and hold for manual entry.' : 'Assistant') : label}
+            title={canLongPress ? 'Press and hold for Manual' : undefined}
+            data-testid={`tab-${label.toLowerCase().replace(' ', '-')}`}
+            onPointerDown={canLongPress ? () => {
+              assistantLongPressTriggered.current = false
+              clearLongPress()
+              assistantLongPressTimer.current = window.setTimeout(() => {
+                assistantLongPressTriggered.current = true
+                setLocation('/assistant?mode=manual')
+                window.dispatchEvent(new CustomEvent('tally:manual-mode'))
+              }, 540)
+            } : undefined}
+            onPointerUp={canLongPress ? clearLongPress : undefined}
+            onPointerLeave={canLongPress ? clearLongPress : undefined}
+            onPointerCancel={canLongPress ? clearLongPress : undefined}
+            onContextMenu={canLongPress ? (event) => event.preventDefault() : undefined}
+            onClick={canLongPress ? (event) => {
+              if (assistantLongPressTriggered.current) {
+                event.preventDefault()
+                event.stopPropagation()
+                assistantLongPressTriggered.current = false
+              }
+            } : undefined}
+          >
+            <span className="tab-icon"><TabIcon size={index === 2 ? 22 : 20} strokeWidth={selected || index === 2 ? 1.8 : 1.5} /></span><span className="tab-label">{label}</span>
           </Link>
         })}
       </nav>
@@ -600,101 +622,8 @@ function RecipeEditor({ kitchen, canUseKitchen, recipe, user, editId }) {
   </div>
 }
 
-function Assistant({ kitchen, isSignedIn, user }) {
-  const chatKey = `tally-chat:${user?.id || 'signed-out'}`
-  const draftKey = `tally-draft:${user?.id || 'signed-out'}`
-  const [messages, setMessages] = useState(() => {
-    try { return JSON.parse(sessionStorage.getItem(chatKey) || '[]') } catch { return [] }
-  })
-  const [draft, setDraft] = useState(() => {
-    try { return JSON.parse(sessionStorage.getItem(draftKey) || 'null') } catch { return null }
-  })
-  const [input, setInput] = useState(() => sessionStorage.getItem(`${chatKey}:input`) || '')
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState('')
-  const [savedNotice, setSavedNotice] = useState('')
-  const [savedRecipeId, setSavedRecipeId] = useState('')
-  const feedRef = useRef(null)
-  const approvalRequestId = useRef(sessionStorage.getItem(`${draftKey}:request`) || idForRequest())
-  const latestRecipe = kitchen.recipes[0]
-  const latestList = kitchen.lists[0]
-  useEffect(() => { sessionStorage.setItem(chatKey, JSON.stringify(messages)) }, [messages, chatKey])
-  useEffect(() => {
-    if (input) sessionStorage.setItem(`${chatKey}:input`, input)
-    else sessionStorage.removeItem(`${chatKey}:input`)
-  }, [chatKey, input])
-  useEffect(() => { if (draft) sessionStorage.setItem(draftKey, JSON.stringify(draft)); else sessionStorage.removeItem(draftKey) }, [draft, draftKey])
-  useEffect(() => { if (draft) sessionStorage.setItem(`${draftKey}:request`, approvalRequestId.current); else sessionStorage.removeItem(`${draftKey}:request`) }, [draft, draftKey])
-  useEffect(() => { if (feedRef.current) feedRef.current.scrollTop = feedRef.current.scrollHeight }, [messages, busy])
-
-  const send = async (event) => {
-    event.preventDefault()
-    const content = input.trim()
-    if (!content || busy) return
-    const previous = messages
-    const outgoing = [...previous, { role: 'user', content }]
-    setMessages(outgoing); setInput(''); setBusy(true); setError(''); setSavedNotice('')
-    try {
-      const safeDraft = assistantDraftPayload(draft)
-      const result = await api('/assistant', { method: 'POST', body: { messages: outgoing, ...(safeDraft ? { draft: safeDraft } : {}) } })
-      if (result.draft && !draft) approvalRequestId.current = idForRequest()
-      setMessages([...outgoing, { role: 'assistant', content: result.reply }])
-      setDraft(result.draft || null)
-    } catch (err) {
-      setError(err.message || 'Tally could not reply. Your message is still here.')
-      setMessages(previous)
-      sessionStorage.setItem(`${chatKey}:input`, content)
-      setInput(content)
-    } finally { setBusy(false) }
-  }
-  const editDraft = (key, value) => setDraft((current) => ({ ...current, [key]: value }))
-  const editIngredient = (index, key, value) => setDraft((current) => ({ ...current, ingredients: current.ingredients.map((item, i) => i === index ? { ...item, [key]: value } : item) }))
-  const editStep = (index, value) => setDraft((current) => ({ ...current, steps: current.steps.map((step, i) => i === index ? value : step) }))
-  const approve = async () => {
-    if (!draft || busy) return
-    const clean = { ...draft, title: draft.title.trim(), servings: Number(draft.servings), prepMinutes: draft.prepMinutes == null || draft.prepMinutes === '' ? null : Number(draft.prepMinutes), cookMinutes: draft.cookMinutes == null || draft.cookMinutes === '' ? null : Number(draft.cookMinutes), ingredients: (draft.ingredients || []).map((i) => ({ ...i, amount: Number(i.amount) })), steps: (draft.steps || []).map((s) => s.trim()).filter(Boolean) }
-    if (!clean.title || !clean.servings || !clean.ingredients.length || clean.ingredients.some((i) => !i.name.trim() || !i.amount || !i.unit.trim()) || !clean.steps.length) { setError('Finish the recipe details before approving. Tally will not guess missing amounts.'); return }
-    setBusy(true); setError(''); setSavedNotice('')
-    try {
-      const saved = await kitchen.request('/recipes/approve', { method: 'POST', body: { recipe: clean, approved: true, requestId: approvalRequestId.current } })
-      kitchen.replaceRecipe(saved); setDraft(null); sessionStorage.removeItem(`${draftKey}:request`); approvalRequestId.current = idForRequest(); setSavedRecipeId(saved.id); setSavedNotice(`Saved “${saved.title}”${isSignedIn ? ' to your cookbook' : ' on this device'}.`)
-    } catch (err) { setError(err.message || 'The recipe was not saved. Your draft is safe; try again.') }
-    finally { setBusy(false) }
-  }
-  return <div className="page assistant-page">
-    <header className="assistant-native-header"><span aria-hidden="true" /><h1>AI Assistant</h1><span aria-hidden="true" /></header>
-    <nav className="assistant-shortcuts" aria-label="Your kitchen">
-      <Link href={latestRecipe ? `/cookbook/${latestRecipe.id}` : '/cookbook'} className="shortcut-chip" data-testid="assistant-latest-recipe"><BookOpen size={18} /><span><small>{latestRecipe ? 'Latest recipe' : 'Cookbook'}</small><strong>{latestRecipe?.title || 'Browse recipes'}</strong></span><ChevronRight size={16} /></Link>
-      <Link href={latestList ? `/groceries/${latestList.id}` : '/groceries'} className="shortcut-chip" data-testid="assistant-latest-list"><ShoppingBasket size={18} /><span><small>{latestList ? 'Latest grocery list' : 'Groceries'}</small><strong>{latestList?.name || 'View your lists'}</strong></span><ChevronRight size={16} /></Link>
-    </nav>
-    <>
-      <section className="conversation-panel" aria-label="Text conversation">
-        <div className="conversation-feed" ref={feedRef} aria-live="polite">
-          {messages.length === 0 && <div className="assistant-welcome"><span className="assistant-orbit"><Sparkles size={21} /></span><div><strong>What are we cooking?</strong></div></div>}
-          {messages.map((message, index) => <div className={`message message-${message.role}`} key={`${index}-${message.role}`}><span className="message-label">{message.role === 'assistant' ? 'Tally' : 'You'}</span><p>{message.content}</p></div>)}
-          {busy && <div className="typing-line"><span /><span /><span /><span className="sr-only">Tally is thinking</span></div>}
-        </div>
-        {error && <ErrorNotice>{error}</ErrorNotice>}
-        {savedNotice && <p className="success-notice" role="status"><CheckCircle2 size={17} />{savedNotice}<Link href={`/cookbook/${savedRecipeId}`}>Open recipe</Link></p>}
-        {draft && <section className="draft-card">
-          <div className="draft-top"><div><span className="draft-status"><span /> Draft · not saved</span><h2>Review this recipe</h2></div><button type="button" className="icon-button" aria-label="Dismiss recipe draft" onClick={() => setDraft(null)}><X size={18} /></button></div>
-          <p className="draft-explainer">Make any corrections. Nothing enters your cookbook until you approve it.</p>
-          <label className="field-label">Recipe name<input value={draft.title || ''} onChange={(e) => editDraft('title', e.target.value)} /></label>
-          <label className="field-label">Description<textarea rows="2" value={draft.description || ''} onChange={(e) => editDraft('description', e.target.value)} /></label>
-          <label className="field-label servings-field">Servings<input type="number" min="1" value={draft.servings || ''} onChange={(e) => editDraft('servings', e.target.value)} /></label>
-          <div className="draft-subhead"><h3>Ingredients</h3><button type="button" className="text-button" onClick={() => editDraft('ingredients', [...(draft.ingredients || []), { name: '', amount: '', unit: '' }])}><Plus size={15} /> Add</button></div>
-          {(draft.ingredients || []).map((item, index) => <div className="ingredient-input-row draft-ingredient" key={index}><input aria-label={`Draft ingredient ${index + 1}`} value={item.name || ''} onChange={(e) => editIngredient(index, 'name', e.target.value)} placeholder="Ingredient" /><input aria-label={`Draft amount ${index + 1}`} type="number" min="0" step="any" value={item.amount ?? ''} onChange={(e) => editIngredient(index, 'amount', e.target.value)} placeholder="Amount" /><input aria-label={`Draft unit ${index + 1}`} value={item.unit || ''} onChange={(e) => editIngredient(index, 'unit', e.target.value)} placeholder="Unit" /></div>)}
-          <div className="draft-subhead"><h3>Method</h3><button type="button" className="text-button" onClick={() => editDraft('steps', [...(draft.steps || []), ''])}><Plus size={15} /> Add</button></div>
-          {(draft.steps || []).map((step, index) => <textarea className="draft-step" aria-label={`Draft method step ${index + 1}`} key={index} rows="2" value={step} onChange={(e) => editStep(index, e.target.value)} placeholder={`Step ${index + 1}`} />)}
-          <label className="field-label">Notes<textarea rows="2" value={draft.notes || ''} onChange={(e) => editDraft('notes', e.target.value)} placeholder="Optional notes" /></label>
-          <div className="draft-actions"><button type="button" className="button button-primary button-full" onClick={approve} disabled={busy}>{busy ? 'Saving…' : <><Check size={18} /> Approve &amp; Save</>}</button><button type="button" className="button button-secondary button-full" onClick={() => { setInput('Could we adjust this recipe?'); document.getElementById('assistant-message')?.focus() }}>Continue conversation</button></div>
-        </section>}
-        {!isSignedIn && <p className="assistant-device-note">Messages use online AI. Recipes save on this device.</p>}
-        <form className="message-composer" onSubmit={send}><label htmlFor="assistant-message" className="sr-only">Message Tally</label><textarea id="assistant-message" rows="1" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); e.currentTarget.form.requestSubmit() } }} placeholder="Message Tally…" /><button className="send-button" type="submit" disabled={!input.trim() || busy} aria-label="Send message"><Send size={19} /></button></form>
-      </section>
-      <p className="quiet-note"><CheckCircle2 size={15} /> Recipes stay drafts until you choose Approve &amp; Save.</p>
-    </>
-  </div>
+function Assistant({ kitchen }) {
+  return <AssistantPage kitchen={kitchen} />
 }
 
 function Groceries({ kitchen, canUseKitchen }) {
@@ -862,9 +791,11 @@ function GroceryPlanner({ kitchen, canUseKitchen, user }) {
   </div>
 }
 
-function SettingsPage({ theme, setTheme, user, isSignedIn }) {
+function SettingsPage({ theme, setTheme, user, isSignedIn, kitchen }) {
+  const [assistantControls, setAssistantControls] = useAssistantControls()
   const displayName = user?.fullName || user?.primaryEmailAddress?.emailAddress || 'Account'
   const appearanceOptions = [['system', 'System'], ['light', 'Light'], ['dark', 'Dark']]
+  const assistantControlOptions = [['visible', 'Visible switch'], ['longpress', 'Long press'], ['both', 'Both']]
   const [activeSheet, setActiveSheet] = useState(null)
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -906,6 +837,22 @@ function SettingsPage({ theme, setTheme, user, isSignedIn }) {
       testId: 'settings-appearance',
     },
     {
+      key: 'assistant-controls',
+      label: 'Assistant controls',
+      value: { visible: 'Visible switch', longpress: 'Long press', both: 'Both' }[assistantControls] || 'Both',
+      Icon: FingerAccess,
+      action: () => setActiveSheet('assistant-controls'),
+      testId: 'settings-assistant-controls',
+    },
+    {
+      key: 'assistant-memory',
+      label: 'Assistant memory',
+      value: 'Review or clear',
+      Icon: Sparkles,
+      action: () => setActiveSheet('assistant-memory'),
+      testId: 'settings-assistant-memory',
+    },
+    {
       key: 'privacy',
       label: 'Privacy & service',
       Icon: CircleHelp,
@@ -929,7 +876,7 @@ function SettingsPage({ theme, setTheme, user, isSignedIn }) {
       {query && <button type="button" onClick={() => { setQuery(''); searchRef.current?.focus() }} aria-label="Clear search"><X size={16} /></button>}
     </label>}
     <div className="settings-native-groups" aria-label="Settings">
-      {[['account'], ['appearance', 'privacy']].map((keys) => {
+      {[['account'], ['appearance', 'assistant-controls', 'assistant-memory', 'privacy']].map((keys) => {
         const rows = visibleRows.filter((row) => keys.includes(row.key))
         return rows.length > 0 && <div className="settings-native-group" key={keys[0]}>
           {rows.map(({ key, label, value, Icon, action, testId }) => <button key={key} type="button" className="settings-native-row" onClick={action} data-testid={testId}>
@@ -945,7 +892,7 @@ function SettingsPage({ theme, setTheme, user, isSignedIn }) {
     <dialog ref={sheetRef} className="settings-native-sheet" aria-labelledby="settings-sheet-title" onClick={(event) => { if (event.target === event.currentTarget) event.currentTarget.close() }} onClose={() => setActiveSheet(null)}>
       <div className="settings-sheet-grabber" aria-hidden="true" />
       <header className="settings-sheet-header">
-        <h2 id="settings-sheet-title">{activeSheet === 'appearance' ? 'Appearance' : 'Privacy & service'}</h2>
+        <h2 id="settings-sheet-title">{activeSheet === 'appearance' ? 'Appearance' : activeSheet === 'assistant-controls' ? 'Assistant controls' : activeSheet === 'assistant-memory' ? 'Assistant memory' : 'Privacy & service'}</h2>
         <button type="button" className="settings-sheet-close" onClick={() => sheetRef.current?.close()} aria-label="Close">Done</button>
       </header>
       {activeSheet === 'appearance'
@@ -955,11 +902,23 @@ function SettingsPage({ theme, setTheme, user, isSignedIn }) {
               <span>{label}</span>{theme === value && <Check size={19} aria-hidden="true" />}
             </label>)}
           </div>
+        : activeSheet === 'assistant-controls'
+          ? <>
+              <p className="settings-helper settings-control-intro">Choose how to move between Chat and Manual in Assistant.</p>
+              <div className="settings-sheet-group" role="radiogroup" aria-label="Assistant mode controls">
+                {assistantControlOptions.map(([value, label]) => <label className="settings-choice-row" key={value}>
+                  <input type="radio" name="tally-assistant-controls" value={value} checked={assistantControls === value} onChange={() => setAssistantControls(value)} data-testid={`assistant-controls-${value}`} />
+                  <span>{label}</span>{assistantControls === value && <Check size={19} aria-hidden="true" />}
+                </label>)}
+              </div>
+            </>
+        : activeSheet === 'assistant-memory'
+          ? <MemorySettings kitchen={kitchen} />
         : <div className="settings-privacy-copy">
-            {!isSignedIn && <section><h3>Guest kitchen</h3><p>Recipes and lists stay in this browser on this device. Clearing browser data removes them; they are not a cloud backup. AI needs an internet connection and sends your conversation and current draft for processing, not your whole kitchen. Recipe-opening counts for Home recommendations stay on this device.</p></section>}
+            {!isSignedIn && <section><h3>Guest kitchen</h3><p>Recipes and lists stay in this browser on this device. Clearing browser data removes them; they are not a cloud backup. Online AI sends conversation context, selected recipe details, and the current proposal for processing—not your whole cookbook or grocery history. Recipe-opening counts for Home recommendations stay on this device.</p></section>}
             {isSignedIn && <section><h3>Account</h3><p>Your cloud recipes and grocery lists are private to your signed-in account. The guest kitchen stays separate on this device.</p></section>}
-            <section><h3>Assistant</h3><p>Messages are sent to Tally’s assistant service to prepare replies. Chat requires sign-in.</p></section>
-            <section><h3>Your recipes</h3><p>Drafts are saved only after you approve them. Voice and recipe media aren’t available in this version.</p></section>
+            <section><h3>Assistant</h3><p>Chat sends conversation context and relevant recipe or grocery details to online AI. Manual recipe and grocery entry does not use AI. Guests can chat; their Assistant memory and history stay on this device.</p></section>
+            <section><h3>Your recipes</h3><p>Drafts are saved only after you approve them. Live voice uses your microphone only after you start a call; raw audio is not saved by Tally.</p></section>
           </div>}
     </dialog>
   </div>

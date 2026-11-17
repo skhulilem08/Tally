@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { approvalSchema, recipeSchema, planSchema, listApprovalSchema } from '../server/validation.js'
 import { calculateGroceries } from '../shared/grocery-calculation.js'
+import { manualListSchema, manualListData } from '../shared/manual-list.js'
 
 export const GUEST_STORAGE_KEY = 'tally-guest-kitchen-v1'
 const storedRecipe = recipeSchema.extend({
@@ -9,7 +10,7 @@ const storedRecipe = recipeSchema.extend({
 const storedList = z.object({
   id: z.string().uuid(), name: z.string(), createdAt: z.string(),
   items: z.array(z.object({
-    id: z.string().uuid(), name: z.string(), amount: z.number().finite().positive(),
+    id: z.string().uuid(), name: z.string(), amount: z.number().finite().positive().nullable(),
     unit: z.string(), checked: z.boolean(),
   })),
 }).passthrough()
@@ -53,6 +54,16 @@ export function createGuestApi(storage) {
     try {
       const data = read()
       if (path === '/bootstrap' && method === 'GET') return { recipes: data.recipes, lists: data.lists }
+      if (path === '/lists/manual' && method === 'POST') {
+        const input = manualListSchema.parse(body)
+        const existing = data.lists.find((list) => list.id === data.listRequests[input.requestId])
+        if (existing) return existing
+        const list = { ...manualListData(input, uuid), id: uuid(), createdAt: now() }
+        data.lists.unshift(list)
+        data.listRequests[input.requestId] = list.id
+        save(data)
+        return list
+      }
       if (path === '/recipes/approve' && method === 'POST') {
         const input = approvalSchema.parse(body)
         const existing = data.recipes.find((recipe) => recipe.id === data.recipeRequests[input.requestId])

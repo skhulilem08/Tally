@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { memorySchema } from '../shared/assistant-state.js'
 
 const text = (max) => z.string().trim().min(1).max(max)
 const amount = z.number().finite().positive().max(1000000)
@@ -56,4 +57,10 @@ export const assistantSchema = z.object({
     'This conversation is too long. Start a new conversation.',
   ),
   draft: recipeSchema.nullish(),
+  groceryPlan: planSchema.extend({ name: text(160) }).nullish(),
+  recipes: z.array(z.object({ id: z.string().uuid(), title: text(160), servings: amount })).max(200).default([]),
+  memory: memorySchema.nullish(),
+  memoryEnabled: z.boolean().default(false),
+  summary: z.string().max(4000).default(''),
+  contextRevision: z.number().int().min(0).optional(),
 })

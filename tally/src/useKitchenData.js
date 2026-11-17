@@ -120,6 +120,7 @@ export function useKitchenData(userId, isSignedIn, isLoaded) {
   const hasData = snapshot.owner === owner
   const load = loadState.owner === owner ? loadState : { loading: Boolean(isSignedIn), error: '' }
   return {
+    owner,
     recipes: hasData ? snapshot.data.recipes : [],
     lists: hasData ? snapshot.data.lists : [],
     loading: !isLoaded || loadState.owner !== owner || load.loading,
