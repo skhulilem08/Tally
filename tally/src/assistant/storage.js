@@ -14,7 +14,9 @@ export function readGuestAssistant() {
   }
 }
 export async function loadAssistant(owner) {
-  return owner === 'guest' ? readGuestAssistant() : api('/assistant/state')
+  if (owner === 'guest') return readGuestAssistant()
+  const result = await api('/assistant/state')
+  return { revision: result.revision, state: assistantStateSchema.parse(result.state) }
 }
 export async function storeAssistant(owner, expectedRevision, state) {
   assistantStateSchema.parse(state)

@@ -4,6 +4,7 @@ import { recipeSchema, planSchema } from '../../server/validation.js'
 import { emptyAssistantState, memorySchema } from '../../shared/assistant-state.js'
 import { ASSISTANT_GUEST_KEY, loadAssistant, storeAssistant } from './storage.js'
 import { useVoiceCall } from './useVoiceCall.js'
+import { correctConversation, explicitMemoryUpdate, recordMemoryUpdate } from '../../shared/assistant-memory.js'
 
 const id = () => crypto.randomUUID()
 const defaultManual = () => ({
@@ -170,17 +171,12 @@ export function useAssistant(kitchen) {
     let pendingInput = text.trim()
     try {
       await persist((state) => {
-        const index = correctionId ? state.messages.findIndex((message) => message.id === correctionId && message.role === 'user') : -1
-        if (correctionId && index < 0) throw new Error('This turn is no longer in the current conversation.')
-        const prior = correctionId ? state.messages.slice(0, index) : state.messages
+        if (correctionId) return correctConversation(state, correctionId, pendingInput, id)
         return {
           ...state,
-          messages: [...prior, { id: id(), role: 'user', content: pendingInput, spoken }].slice(-60),
-          // Corrections remove derived memory too, so the misheard fact cannot
-          // survive in personalized context. The user can inspect/rebuild it.
-          ...(correctionId ? { memory: { facts: [], narrative: '' }, summary: '', draft: null, groceryPlan: null, recipeRequestId: id(), groceryRequestId: id() } : {}),
+          messages: [...state.messages, { id: id(), role: 'user', content: pendingInput, spoken, memoryRevision: state.memoryRevision || 0 }].slice(-60),
         }
-      })
+      }, { optimistic: !correctionId })
       if (turn !== generation.current || live.current !== context) return ''
       const state = context.state
       const sequence = context.sequence
@@ -198,6 +194,7 @@ export function useAssistant(kitchen) {
       if (turn !== generation.current || live.current !== context || sequence !== context.sequence) return ''
       const memoryChanged = state.enabled && response.memoryUpdate &&
         JSON.stringify(response.memoryUpdate) !== JSON.stringify(state.memory)
+      const sourceMessageId = state.messages.findLast((message) => message.role === 'user')?.id
       await persist((current) => ({
         ...current,
         messages: [
@@ -205,7 +202,7 @@ export function useAssistant(kitchen) {
           ...(memoryChanged ? [{ id: id(), role: 'event', content: 'Memory updated' }] : []),
         ].slice(-60),
         summary: response.summary ?? current.summary,
-        memory: memoryChanged ? response.memoryUpdate : current.memory,
+        ...(memoryChanged ? recordMemoryUpdate(current, response.memoryUpdate, sourceMessageId) : {}),
         draft: response.draft || current.draft,
         groceryPlan: response.groceryPlan || current.groceryPlan,
         recipeRequestId: response.draft ? id() : current.recipeRequestId,
@@ -290,17 +287,17 @@ export function useAssistant(kitchen) {
     cancelTurn(); voice.interrupt()
     try {
       const validated = memorySchema.parse(memory)
-      await persist((state) => ({ ...state, memory: validated, messages: [...state.messages, { id: id(), role: 'event', content: 'Memory updated' }].slice(-60) }), { optimistic: false })
+      await persist((state) => ({ ...state, ...explicitMemoryUpdate(state, validated), messages: [...state.messages, { id: id(), role: 'event', content: 'Memory updated' }].slice(-60) }), { optimistic: false })
     } catch (failure) { setError(readableError(failure)); throw failure }
   }
   async function forgetMemory() {
     voice.end(); cancelTurn(); setGroceryPreview(null)
-    await persist((state) => ({ ...state, memory: { facts: [], narrative: '' }, summary: '', messages: [], draft: null, groceryPlan: null, manual: null, recipeRequestId: id(), groceryRequestId: id() }))
+    await persist((state) => ({ ...state, ...explicitMemoryUpdate(state, { facts: [], narrative: '' }), summary: '', messages: [], draft: null, groceryPlan: null, manual: null, recipeRequestId: id(), groceryRequestId: id() }))
     setNotice('Personal memory and conversation history were cleared.')
   }
   async function clearConversation() {
     voice.end(); cancelTurn(); setGroceryPreview(null)
-    await persist((state) => ({ ...state, messages: [], summary: '', draft: null, groceryPlan: null, recipeRequestId: id(), groceryRequestId: id() }))
+    await persist((state) => ({ ...state, ...explicitMemoryUpdate(state, state.memory), messages: [], summary: '', draft: null, groceryPlan: null, recipeRequestId: id(), groceryRequestId: id() }))
     setNotice('Conversation cleared. Personal memory kept.')
   }
   function setMode(mode) {

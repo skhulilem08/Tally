@@ -1,0 +1,18 @@
+/* Shared row geometry: labels may wrap, but single-line fields never stagger. */
+:is(
+  .field-pair, .ingredient-input-row, .manual-recipe-numbers,
+  .manual-ingredient-row, .assistant-draft-numbers, .assistant-edit-row,
+  .memory-settings-fact
+) {
+  align-items: end;
+}
+:is(
+  .field-pair, .ingredient-input-row, .manual-recipe-numbers,
+  .manual-ingredient-row, .assistant-draft-numbers, .assistant-edit-row,
+  .memory-settings-fact
+) input {
+  box-sizing: border-box;
+  min-width: 0;
+  height: 52px;
+  min-height: 52px;
+}

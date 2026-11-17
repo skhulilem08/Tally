@@ -11,7 +11,7 @@
 .back-button:hover, .icon-button:hover { background: var(--inset); }
 .back-button:active, .icon-button:active, .button:active, .tab-item:active { transform: scale(.97); }
 .topbar .topbar-context { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.screen-content { width: 100%; max-width: 760px; flex: 1; padding: 0 24px calc(100px + var(--safe-bottom)); margin: 0 auto; }
+.screen-content { width: 100%; max-width: 760px; flex: 1; padding: 0 24px calc(112px + var(--safe-bottom)); margin: 0 auto; }
 .page { max-width: 620px; margin: 0 auto; padding: 31px 0 12px; animation: settle .22s ease both; }
 @keyframes settle { from { opacity: .82; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 .screen-title { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 27px; }
@@ -21,14 +21,88 @@
 .title-action { padding-bottom: 2px; }
 .accent-icon { background: var(--accent); color: var(--on-accent); }
 .accent-icon:hover { background: var(--accent); filter: brightness(1.06); }
-.tabbar { position: fixed; z-index: 5; bottom: 0; left: 0; right: 0; display: grid; grid-template-columns: repeat(5, 1fr); align-items: end; min-height: calc(69px + var(--safe-bottom)); padding: 4px max(8px, calc((100vw - 660px) / 2)) var(--safe-bottom); border-top: 1px solid var(--line); background: var(--surface); }
-.tab-item { color: var(--muted); display: flex; min-width: 0; min-height: 60px; text-decoration: none; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px; padding: 4px 1px 3px; border-radius: 12px; transition: transform .15s ease, color .15s ease; -webkit-tap-highlight-color: transparent; }
-.tab-icon { width: 38px; height: 31px; display: grid; place-items: center; }
-.tab-label { font-size: clamp(10px, 2.6vw, 11px); font-weight: 550; line-height: 1.1; white-space: nowrap; }
+.tabbar {
+  position: fixed;
+  z-index: 5;
+  left: 50%;
+  bottom: calc(10px + var(--safe-bottom));
+  width: min(660px, calc(100% - 24px));
+  min-height: 76px;
+  padding: 7px 8px 8px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: stretch;
+  border: 0;
+  border-radius: 27px;
+  background: var(--surface);
+  box-shadow: 0 7px 22px rgba(30, 25, 19, .14), 0 1px 3px rgba(30, 25, 19, .08);
+  transform: translateX(-50%);
+  isolation: isolate;
+}
+.tabbar::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: -24px;
+  left: 50%;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: var(--bg);
+  transform: translateX(-50%);
+}
+.tab-item {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  min-height: 60px;
+  padding: 2px 1px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  border-radius: 16px;
+  color: var(--muted);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: color .16s ease, transform .16s ease;
+}
+.tab-icon { width: 34px; height: 31px; display: grid; place-items: center; }
+.tab-label { max-width: 100%; font-size: clamp(9px, 2.8vw, 11px); font-weight: 550; line-height: 1.15; white-space: nowrap; }
 .tab-item.selected { color: var(--accent-ink); }
-.tab-assistant .tab-icon { width: 46px; height: 39px; border-radius: 15px; color: var(--on-accent); background: var(--accent); margin-top: -12px; box-shadow: 0 3px 0 color-mix(in srgb, var(--accent) 72%, var(--text)); }
+.tab-item.selected::after {
+  content: "";
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translateX(-50%);
+}
 .tab-assistant { color: var(--text); font-weight: 650; }
+.tab-assistant .tab-icon {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  width: 58px;
+  height: 58px;
+  margin: 0;
+  border-radius: 50%;
+  color: var(--on-accent);
+  background: var(--accent);
+  box-shadow: 0 4px 9px rgba(30, 25, 19, .16);
+  transform: translateX(-50%);
+  transition: transform .16s ease;
+}
+.tab-assistant .tab-label { margin-top: 34px; }
 .tab-assistant.selected { color: var(--accent-ink); }
+.tab-item:active { transform: scale(.95); }
+.tab-assistant:active .tab-icon { transform: translateX(-50%) scale(.96); }
+.tab-item:focus-visible { outline: 3px solid var(--outline); outline-offset: 1px; }
+.tab-assistant:focus-visible .tab-icon { outline: 3px solid var(--outline); outline-offset: 3px; }
 .history-row:hover, .recipe-row:hover { background: var(--inset); }
 .tile-symbol { width: 43px; height: 43px; flex: 0 0 43px; display: grid; place-items: center; border-radius: 15px; }
 .orange-symbol { background: #ffeadc; color: #9c3b00; }
@@ -47,7 +121,7 @@
 .button-primary { background: var(--accent); color: var(--on-accent); }
 .button-secondary { background: var(--inset); color: var(--text); border: 1px solid var(--line); }
 .button-danger { background: var(--danger); color: var(--surface); }
-.button-full { width: 100%; }
+.button-full { width: 100%; border-radius: 999px; }
 .empty-state { text-align: center; padding: 37px 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; margin: 17px 0; }
 .empty-icon { width: 50px; height: 50px; background: var(--inset); color: var(--accent-ink); border-radius: 17px; display: grid; place-items: center; margin: 0 auto 15px; }
 .empty-state h2 { font-size: 20px; margin: 0 0 7px; letter-spacing: -.025em; }
@@ -301,8 +375,6 @@
   .screen-title { margin-bottom: 21px; }
 }
 @media (max-width: 365px) {
-  .tabbar { padding-left: 3px; padding-right: 3px; }
-  .tab-label { font-size: 9px; }
   .ingredient-input-row { grid-template-columns: minmax(0, 1fr) 62px 60px 29px; gap: 4px; }
   .ingredient-input-row input { padding-left: 6px; padding-right: 5px; }
 }
@@ -397,7 +469,7 @@
   }
 }
 .settings-shell .topbar { display: none; }
-.settings-shell .screen-content { max-width: 560px; padding: 0 20px calc(100px + var(--safe-bottom)); }
+.settings-shell .screen-content { max-width: 560px; padding: 0 20px calc(112px + var(--safe-bottom)); }
 .settings-native-page { max-width: 500px; padding-top: 14px; }
 .settings-native-header {
   position: relative;
@@ -600,7 +672,7 @@
 }
 
 /* Home uses Settings' solid neutral visual system with a content-led native layout. */
-.home-screen-content { max-width: 760px; padding: 0 20px calc(98px + var(--safe-bottom)); }
+.home-screen-content { max-width: 760px; padding: 0 20px calc(112px + var(--safe-bottom)); }
 .home-shell .home-page { max-width: 620px; padding: 8px 0 24px; animation: none; }
 .home-greeting {
   display: flex;
@@ -885,7 +957,7 @@
 
 /* Cookbook keeps the shared Home/Settings palette with a recipe-card collection layout. */
 .cookbook-shell .topbar { display: none; }
-.cookbook-screen-content { max-width: 780px; padding: 0 20px calc(100px + var(--safe-bottom)); }
+.cookbook-screen-content { max-width: 780px; padding: 0 20px calc(112px + var(--safe-bottom)); }
 .cookbook-page { max-width: 700px; padding-top: 14px; animation: none; }
 .cookbook-native-header {
   min-height: 46px;
@@ -1144,7 +1216,7 @@
 
 /* Groceries is a native, text-first history of approved lists. */
 .groceries-shell .topbar { display: none; }
-.groceries-screen-content { max-width: 700px; padding: 0 20px calc(100px + var(--safe-bottom)); }
+.groceries-screen-content { max-width: 700px; padding: 0 20px calc(112px + var(--safe-bottom)); }
 .groceries-page { max-width: 620px; padding-top: 14px; animation: none; }
 .groceries-native-header {
   min-height: 46px;

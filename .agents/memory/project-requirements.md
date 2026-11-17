@@ -147,11 +147,29 @@ Assistant must have no general typing input and minimal explanatory text; its he
 
 **How to apply:** Use opposite header shortcut icons and a centered title. Manual entry begins with full-width New recipe and New grocery list buttons, not cards, followed by native wizard controls and full-width continuation/save actions. In Settings choose visible mode switch, long press or both; Assistant memory opens within Settings, never by navigating to Assistant.
 
-Light-mode icons on orange-filled backgrounds must be white, and touch/mouse interactions must not show browser-style square focus boxes.
+Manual wizard fields must match the Cookbook search bar, and full-width choice/navigation/save buttons must be text-only with maximum pill-shaped corner radius.
 
-**Why:** The user explicitly requested both consistency corrections across the app.
+**Why:** The user repeated the consistency correction and explicitly rejected icons on the manual choice buttons and the web-like input fields.
 
-**How to apply:** Separate icon foreground from button-label contrast; keep the approved dark gold untouched. Suppress tap/pointer boxes while retaining an accessible rounded keyboard-only focus indication.
+**How to apply:** Reuse the solid borderless search-field treatment. Full-width action buttons have maximum capsule rounding; inputs stay rounded rectangles. Do not reintroduce icons into full-width manual buttons; small ingredient add/remove controls remain separate.
+
+In manual mode use the name Create, header Back/X controls, a filling recipe progress bar with only the current stage title, and an animated kitchen illustration above the initial buttons.
+
+**Why:** The user clarified that the navigation label and header must change with mode; they rejected numbered stage tabs and requested a heading/animation/buttons composition.
+
+**How to apply:** Choice header asks what to add. Back moves one stage, X returns to choices while preserving unfinished work. Multiline fields must grow with their content, and inputs sharing a row must have equal heights even when mobile labels wrap.
+
+Mark required form fields with red asterisks, omit “Optional” labels and use a small unboxed “* Required fields” note.
+
+**Why:** The user confirmed that equal-height inputs were correct, but pointed out that extra Optional label lines misaligned the Servings/Prep/Cook headings on mobile.
+
+**How to apply:** Group each label and its asterisk in one inline wrapper. Do not create a separate grid row for an optional/required marker or add a disclaimer card.
+
+Light-mode orange-filled buttons must use white text and white icons, and touch/mouse interactions must not show browser-style square focus boxes.
+
+**Why:** The user explicitly requested these consistency corrections across the app and repeated that both text and icons on orange buttons must be white in light mode.
+
+**How to apply:** Apply the shared white-on-orange foreground to both labels and symbols in light mode; keep approved dark gold untouched. Do not silently change text to black, or claim this bright-orange/white small-text combination passes contrast requirements. Suppress tap/pointer boxes while retaining an accessible rounded keyboard-only focus indication.
 
 The product assistant needs a private, self-maintained `memory.md` per user, combining a general-facts table with narrative summaries of preferences and situational cooking habits.
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'wouter'
 import {
-  BookOpen, Check, CheckCircle2, Plus, ShoppingBasket, X,
+  ArrowLeft, BookOpen, Check, CheckCircle2, Plus, ShoppingBasket, X,
 } from '../icons.jsx'
 import { useAssistantControls } from './preferences.js'
 import { useAssistant } from './useAssistant.js'
@@ -24,6 +24,13 @@ function AssistantPage({ kitchen }) {
   const groceryPlan = a.groceryPlan
   const voice = a.voice
   const messages = a.messages || []
+  const creating = a.mode === 'manual'
+  const inCreateFlow = creating && a.manual.kind !== 'choose'
+  const closeCreateFlow = () => a.setManual({ ...a.manual, kind: 'choose', step: 0 })
+  const backCreateFlow = () => {
+    if (a.manual.kind === 'recipe' && a.manual.step > 0) a.setManual({ ...a.manual, step: a.manual.step - 1 })
+    else closeCreateFlow()
+  }
 
   useEffect(() => {
     if (feedRef.current) feedRef.current.scrollTop = feedRef.current.scrollHeight
@@ -79,6 +86,7 @@ function AssistantPage({ kitchen }) {
   const voiceLabel = {
     idle: 'Voice is off',
     requesting: 'Waiting for microphone permission',
+    preparing: 'Starting microphone',
     listening: 'Listening',
     transcribing: 'Working out what you said',
     thinking: 'Tally is thinking',
@@ -89,30 +97,36 @@ function AssistantPage({ kitchen }) {
 
   return (
     <div className="assistant-screen" aria-labelledby="assistant-title">
-      <header className="cookbook-native-header assistant-native-header">
-        <Link
+      <header className={`cookbook-native-header assistant-native-header ${creating && !inCreateFlow ? 'is-create-choice' : ''}`}>
+        {creating ? (inCreateFlow
+          ? <button type="button" className="assistant-header-link" onClick={backCreateFlow} aria-label="Go back one step" data-testid="button-create-back"><ArrowLeft size={21} /></button>
+          : <span aria-hidden="true" />)
+          : <Link
           href={latestRecipe ? `/cookbook/${latestRecipe.id}` : '/cookbook'}
           className="assistant-header-link"
           aria-label={latestRecipe ? `Cookbook, latest recipe ${latestRecipe.title}` : 'Open cookbook'}
           data-testid="link-assistant-cookbook"
         >
           <BookOpen size={22} />
-        </Link>
-        <h1 id="assistant-title">Assistant</h1>
-        <Link
+        </Link>}
+        <h1 id="assistant-title">{creating ? (inCreateFlow ? a.manual.kind === 'recipe' ? 'New recipe' : 'New grocery list' : 'What would you like to add?') : 'Assistant'}</h1>
+        {creating ? (inCreateFlow
+          ? <button type="button" className="assistant-header-link" onClick={closeCreateFlow} aria-label="Close entry and return to choices" data-testid="button-create-close"><X size={21} /></button>
+          : <span aria-hidden="true" />)
+          : <Link
           href={latestList ? `/groceries/${latestList.id}` : '/groceries'}
           className="assistant-header-link"
           aria-label={latestList ? `Groceries, latest list ${latestList.name}` : 'Open groceries'}
           data-testid="link-assistant-groceries"
         >
           <ShoppingBasket size={22} />
-        </Link>
+        </Link>}
       </header>
 
-      {controls !== 'longpress' && <div className="assistant-toolbar">
+      {controls !== 'longpress' && !inCreateFlow && <div className="assistant-toolbar">
         <div className="assistant-mode-switch" role="group" aria-label="Assistant mode">
-          <button type="button" aria-pressed={a.mode === 'chat'} onClick={() => a.setMode('chat')} data-testid="button-assistant-chat-mode">Chat</button>
-          <button type="button" aria-pressed={a.mode === 'manual'} onClick={() => a.setMode('manual')} data-testid="button-assistant-manual-mode">Manual</button>
+          <button type="button" aria-pressed={a.mode === 'chat'} onClick={() => a.setMode('chat')} data-testid="button-assistant-chat-mode">Voice</button>
+          <button type="button" aria-pressed={a.mode === 'manual'} onClick={() => a.setMode('manual')} data-testid="button-assistant-manual-mode">Create</button>
         </div>
       </div>}
 

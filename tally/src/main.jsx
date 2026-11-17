@@ -4,6 +4,7 @@ import './index.css'
 import App from './App.jsx'
 import './focus.css'
 import './accent-icons.css'
+import './controls.css'
 
 document.documentElement.dataset.inputModality = 'pointer'
 window.addEventListener('pointerdown', () => {

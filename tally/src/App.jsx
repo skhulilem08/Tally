@@ -243,8 +243,8 @@ function AppShell({ children }) {
             href={href}
             className={`tab-item ${selected ? 'selected' : ''} ${index === 2 ? 'tab-assistant' : ''}`}
             aria-current={selected ? 'page' : undefined}
-            aria-label={index === 2 ? (canLongPress ? 'Assistant. Press and hold for manual entry.' : 'Assistant') : label}
-            title={canLongPress ? 'Press and hold for Manual' : undefined}
+            aria-label={index === 2 ? (canLongPress ? `${assistantMode === 'manual' ? 'Create' : 'Assistant'}. Press and hold to switch modes.` : assistantMode === 'manual' ? 'Create' : 'Assistant') : label}
+            title={canLongPress ? 'Press and hold to switch modes' : undefined}
             data-testid={`tab-${label.toLowerCase().replace(' ', '-')}`}
             onPointerDown={canLongPress ? () => {
               assistantLongPressTriggered.current = false
@@ -267,7 +267,7 @@ function AppShell({ children }) {
               }
             } : undefined}
           >
-            <span className="tab-icon"><TabIcon size={index === 2 ? 22 : 20} strokeWidth={selected || index === 2 ? 1.8 : 1.5} /></span><span className="tab-label">{label}</span>
+            <span className="tab-icon"><TabIcon size={index === 2 ? 22 : 20} strokeWidth={selected || index === 2 ? 1.8 : 1.5} /></span><span className="tab-label">{index === 2 ? (assistantMode === 'manual' ? 'Create' : 'Assistant') : label}</span>
           </Link>
         })}
       </nav>
@@ -904,7 +904,7 @@ function SettingsPage({ theme, setTheme, user, isSignedIn, kitchen }) {
           </div>
         : activeSheet === 'assistant-controls'
           ? <>
-              <p className="settings-helper settings-control-intro">Choose how to move between Chat and Manual in Assistant.</p>
+              <p className="settings-helper settings-control-intro">Choose how to switch between Voice and Create.</p>
               <div className="settings-sheet-group" role="radiogroup" aria-label="Assistant mode controls">
                 {assistantControlOptions.map(([value, label]) => <label className="settings-choice-row" key={value}>
                   <input type="radio" name="tally-assistant-controls" value={value} checked={assistantControls === value} onChange={() => setAssistantControls(value)} data-testid={`assistant-controls-${value}`} />
@@ -919,6 +919,7 @@ function SettingsPage({ theme, setTheme, user, isSignedIn, kitchen }) {
             {isSignedIn && <section><h3>Account</h3><p>Your cloud recipes and grocery lists are private to your signed-in account. The guest kitchen stays separate on this device.</p></section>}
             <section><h3>Assistant</h3><p>Chat sends conversation context and relevant recipe or grocery details to online AI. Manual recipe and grocery entry does not use AI. Guests can chat; their Assistant memory and history stay on this device.</p></section>
             <section><h3>Your recipes</h3><p>Drafts are saved only after you approve them. Live voice uses your microphone only after you start a call; raw audio is not saved by Tally.</p></section>
+            <section><h3>Animation credits</h3><p>Cooking pot by Sebin Simon, based on work by edi wasito. <a href={`${basePath}/licenses/cooking-pot.txt`} target="_blank" rel="noreferrer">Lottie Simple License</a></p></section>
           </div>}
     </dialog>
   </div>

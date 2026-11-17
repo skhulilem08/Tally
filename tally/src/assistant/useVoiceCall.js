@@ -56,6 +56,7 @@ export function useVoiceCall({ onTranscript, onInterrupt, scope }) {
     if (call) {
       call.turn++
       clearTimeout(call.timeout)
+      clearInterval(call.watchdog)
       stopPlayback(call)
       call.stream?.getTracks().forEach((track) => track.stop())
       call.node?.disconnect()
@@ -129,20 +130,18 @@ export function useVoiceCall({ onTranscript, onInterrupt, scope }) {
     session.current = call
     setView({ active: true, muted: false, status: 'requesting', error: '' })
     try {
-      if (!navigator.mediaDevices?.getUserMedia || !window.AudioContext || !window.AudioWorkletNode) throw new Error('Voice calling is unavailable in this browser. Use manual entry.')
+      if (!navigator.mediaDevices?.getUserMedia || !window.AudioContext) throw new Error('Voice calling is unavailable in this browser. Use manual entry.')
       // Resume from the explicit user gesture for iOS playback permission.
       call.context = new AudioContext()
       await call.context.resume()
       call.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }, video: false })
       if (session.current !== call) { call.stream.getTracks().forEach((track) => track.stop()); return }
-      await call.context.audioWorklet.addModule(`${base}/tally-mic-worklet.js`)
-      if (session.current !== call) return
+      update(call, { status: 'preparing' })
       call.source = call.context.createMediaStreamSource(call.stream)
-      call.node = new AudioWorkletNode(call.context, 'tally-mic')
       call.silent = call.context.createGain()
       call.silent.gain.value = 0
-      call.source.connect(call.node).connect(call.silent).connect(call.context.destination)
-      call.node.port.onmessage = ({ data }) => {
+      const consumeAudio = (data) => {
+        call.lastFrame = Date.now()
         if (session.current !== call || call.muted) return
         const duration = data.length / call.context.sampleRate
         const rms = Math.sqrt(data.reduce((n, sample) => n + sample * sample, 0) / data.length)
@@ -173,6 +172,34 @@ export function useVoiceCall({ onTranscript, onInterrupt, scope }) {
           }
         }
       }
+      let workletTimeout
+      try {
+        if (!call.context.audioWorklet || !window.AudioWorkletNode) throw new Error('Worklet unavailable')
+        await Promise.race([
+          call.context.audioWorklet.addModule(`${base}/tally-mic-worklet.js`),
+          new Promise((_resolve, reject) => { workletTimeout = setTimeout(() => reject(new Error('Worklet initialization timed out')), 5000) }),
+        ])
+        if (session.current !== call) return
+        call.node = new AudioWorkletNode(call.context, 'tally-mic')
+        call.node.port.onmessage = ({ data }) => consumeAudio(data)
+      } catch {
+        if (session.current !== call) return
+        if (!call.context.createScriptProcessor) throw new Error('This browser could not start audio capture. Try another browser or use Create.')
+        // Compatibility capture for browsers where worklet initialization is
+        // unavailable/hangs. It uses the same actual PCM stream and VAD, not
+        // fabricated transcripts or a simulated microphone state.
+        call.node = call.context.createScriptProcessor(2048, 1, 1)
+        call.node.onaudioprocess = (event) => consumeAudio(event.inputBuffer.getChannelData(0).slice())
+      } finally { clearTimeout(workletTimeout) }
+      if (session.current !== call) return
+      call.source.connect(call.node).connect(call.silent).connect(call.context.destination)
+      call.lastFrame = Date.now()
+      call.watchdog = setInterval(() => {
+        if (session.current === call && Date.now() - call.lastFrame > 10000) {
+          end()
+          setView({ active: false, muted: false, status: 'error', error: 'The microphone produced no audio. Try starting again or use Create.' })
+        }
+      }, 5000)
       call.stream.getAudioTracks()[0].onended = () => {
         if (session.current === call) { end(); setView((value) => ({ ...value, status: 'error', error: 'Microphone access ended. Start the call again or use manual entry.' })) }
       }
