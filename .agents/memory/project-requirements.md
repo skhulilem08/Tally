@@ -116,3 +116,15 @@ Use five bottom tabs in this order: Home, Cookbook, AI Assistant, Groceries, Set
 **Why:** The user supplied a design addendum to update the Markdown specifications; it explicitly supersedes the original three-tab navigation.
 
 **How to apply:** Treat the old three-tab layout and unspecified fifth page as superseded. Home's personal promotions and most-opened recommendations are confirmed by the user's subsequent clarification; other illustrative addendum modules are not automatically approved. The addendum's Expo/TypeScript recommendation and unselected name ideas do not override the user's JavaScript/PWA and Tally choices.
+
+AI Assistant's signature interaction is a live voice call with updating recipe and grocery UI in the conversation, not recorded voice messages.
+
+**Why:** The user reiterated the original PDF's call-like requirement and explained that they want to talk through adjustments while structured components update without ending the conversation.
+
+**How to apply:** Preserve text as a fallback, explicit approval before recipe/list saves, and guest access. Do not describe text chat or record-and-send voice messages as completion of the live-call requirement. Move the recent recipe/Cookbook and recent list/Groceries shortcuts to opposite ends of the centered Assistant header as icons rather than side-by-side cards.
+
+The product assistant needs a private, self-maintained `memory.md` per user, combining a general-facts table with narrative summaries of preferences and situational cooking habits.
+
+**Why:** The user requested personalization across chats, including explicit remember requests and a visible “Memory updated” chat event.
+
+**How to apply:** Treat this as app-user data, never the development agent's memory or a shared repository file. Preserve device-only guest ownership and account isolation. Confirm memory updates only after persistence; support correcting and forgetting learned details.
