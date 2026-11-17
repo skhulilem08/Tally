@@ -159,9 +159,9 @@ In manual mode use the name Create, header Back/X controls, a filling recipe pro
 
 **How to apply:** Choice header asks what to add. Back moves one stage, X returns to choices while preserving unfinished work. Multiline fields must grow with their content, and inputs sharing a row must have equal heights even when mobile labels wrap.
 
-Mark required form fields with red asterisks, omit “Optional” labels and use a small unboxed “* Required fields” note.
+Mark required form fields with bold orange/light or gold/dark asterisks, omit “Optional” labels, and put the unboxed “* Required fields” note at the far right of the current step-title row in the theme accent, at regular weight.
 
-**Why:** The user confirmed that equal-height inputs were correct, but pointed out that extra Optional label lines misaligned the Servings/Prep/Cook headings on mobile.
+**Why:** The user confirmed that equal-height inputs were correct, but pointed out that extra Optional label lines misaligned the Servings/Prep/Cook headings on mobile. They then replaced the red markers and separate note line with theme-accent markers and a right-aligned note beside the step title.
 
 **How to apply:** Group each label and its asterisk in one inline wrapper. Do not create a separate grid row for an optional/required marker or add a disclaimer card.
 

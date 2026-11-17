@@ -20,7 +20,7 @@ async function fixture(t, options = {}) {
   t.after(() => new Promise((resolve) => { server.close(resolve); server.closeAllConnections() }))
   return (path = '', { owner, body, ...options } = {}) => fetch(`http://127.0.0.1:${server.address().port}/api/assistant${path}`, {
     ...options, headers: { ...(owner ? { 'x-owner': owner } : {}), ...(body ? { 'content-type': 'application/json' } : {}), ...options.headers },
-    body: body ? JSON.stringify(body) : options.body,
+    body: Buffer.isBuffer(body) ? body : body ? JSON.stringify(body) : options.body,
   })
 }
 
@@ -32,6 +32,49 @@ test('memory Markdown represents canonical facts and narrative without table inj
   const state = emptyAssistantState(randomUUID)
   assert.equal(assistantStateSchema.parse(state).mode, 'chat')
   assert.throws(() => assistantStateSchema.parse({ ...state, memory: { facts: [{ label: '', value: 'x' }], narrative: '' } }))
+})
+
+test('seven consecutive voice turns work for guests and accounts while each provider stays bounded', async (t) => {
+  const calls = { recognition: 0, reply: 0, playback: 0 }
+  const fetchRoute = await fixture(t, {
+    transcribe: async (audio) => {
+      assert.ok(Buffer.isBuffer(audio))
+      calls.recognition++
+      return { text: 'A spoken test turn' }
+    },
+    reply: async () => {
+      calls.reply++
+      return { reply: 'A reply', draft: null, groceryPlan: null, memoryUpdate: null, summary: '' }
+    },
+    speak: async () => {
+      calls.playback++
+      return new Response(new Uint8Array([1, 2]), { headers: { 'content-type': 'audio/mpeg' } })
+    },
+  })
+  const message = { messages: [{ role: 'user', content: 'A spoken test turn' }] }
+  // All 21 requests for each owner occur in the same five-minute window.
+  // Provider implementations are deliberately stubbed: this tests budgets,
+  // not WAV decoding or the separately verified external provider round trip.
+  for (const owner of [undefined, 'voice-account']) {
+    for (let turn = 0; turn < 7; turn++) {
+      const recognized = await fetchRoute('/transcribe', { owner, method: 'POST', headers: { 'content-type': 'audio/wav' }, body: Buffer.from('fixture audio') })
+      assert.equal(recognized.status, 200, `recognition ${owner || 'guest'} turn ${turn + 1}`)
+      await recognized.json()
+      const reply = await fetchRoute('', { owner, method: 'POST', body: message })
+      assert.equal(reply.status, 200, `reply ${owner || 'guest'} turn ${turn + 1}`)
+      await reply.json()
+      const spoken = await fetchRoute('/speak', { owner, method: 'POST', body: { text: 'A reply' } })
+      assert.equal(spoken.status, 200, `playback ${owner || 'guest'} turn ${turn + 1}`)
+      await spoken.arrayBuffer()
+    }
+  }
+  assert.deepEqual(calls, { recognition: 14, reply: 14, playback: 14 })
+  for (let turn = 7; turn < 20; turn++) {
+    assert.equal((await fetchRoute('', { owner: 'voice-account', method: 'POST', body: message })).status, 200)
+  }
+  assert.equal((await fetchRoute('', { owner: 'voice-account', method: 'POST', body: message })).status, 429)
+  assert.equal((await fetchRoute('/speak', { owner: 'voice-account', method: 'POST', body: { text: 'Still within playback budget' } })).status, 200)
+  assert.equal((await fetchRoute('', { method: 'POST', body: message })).status, 200)
 })
 
 test('account state and memory are owner-scoped, authenticated and revision guarded', async (t) => {

@@ -28,9 +28,12 @@ export function createAssistantRouter({
     res.setHeader('Vary', 'Cookie')
     next()
   })
-  const usageLimit = rateLimit({
+  // A spoken turn uses each provider stage once. Independent budgets prevent
+  // the seventh normal turn from hitting a shared 20-request cap mid-call.
+  const providerLimit = (identifier) => rateLimit({
     windowMs: 300000,
     limit,
+    identifier,
     keyGenerator: (req) => {
       const userId = identify(req)
       return userId ? `account:${userId}` : `guest:${ipKeyGenerator(req.ip || req.socket.remoteAddress || 'unknown')}`
@@ -39,6 +42,9 @@ export function createAssistantRouter({
     legacyHeaders: false,
     message: { error: 'Give your kitchen assistant a moment. Please try again shortly.' },
   })
+  const replyLimit = providerLimit('assistant-replies')
+  const transcriptionLimit = providerLimit('speech-recognition')
+  const speechLimit = providerLimit('speech-playback')
   const requireOwner = (req, res, next) => {
     req.assistantOwner = identify(req)
     if (!req.assistantOwner) return res.status(401).json({ error: 'Sign in to access account memory. Guest memory stays on this device.' })
@@ -65,7 +71,7 @@ export function createAssistantRouter({
     res.send(memoryMarkdown(state.memory))
   })
   // Rate limit before reading/decoding audio; bound memory and paid usage.
-  router.post('/transcribe', requireSameOrigin, usageLimit, raw({ type: 'audio/wav', limit: '626kb' }), async (req, res) => {
+  router.post('/transcribe', requireSameOrigin, transcriptionLimit, raw({ type: 'audio/wav', limit: '626kb' }), async (req, res) => {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), 45000)
     res.on('close', () => { if (!res.writableEnded) controller.abort() })
@@ -78,7 +84,7 @@ export function createAssistantRouter({
     }
     finally { clearTimeout(timer) }
   })
-  router.post('/speak', requireSameOrigin, usageLimit, async (req, res) => {
+  router.post('/speak', requireSameOrigin, speechLimit, async (req, res) => {
     const { text } = z.object({ text: z.string().trim().min(1).max(2200) }).parse(req.body)
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), 45000)
@@ -94,7 +100,7 @@ export function createAssistantRouter({
       else res.destroy()
     } finally { clearTimeout(timer) }
   })
-  router.post('/', requireSameOrigin, usageLimit, async (req, res) => {
+  router.post('/', requireSameOrigin, replyLimit, async (req, res) => {
     const input = assistantSchema.parse(req.body)
     const owner = identify(req)
     if (owner && input.contextRevision !== undefined) {

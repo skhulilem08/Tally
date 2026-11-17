@@ -26,7 +26,8 @@
 .manual-kitchen-animation svg { width: 100%; height: 100%; display: block; }
 .manual-wizard-progress { height: 5px; overflow: hidden; margin: 0 0 20px; border-radius: 999px; background: var(--inset); }
 .manual-wizard-progress > span { display: block; width: 100%; height: 100%; background: var(--accent); border-radius: inherit; transform-origin: left; transition: transform .22s ease; }
-.manual-current-step { margin: 0 0 22px; font-size: 21px; font-weight: 650; letter-spacing: -.02em; }
+.manual-step-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 0 0 20px; }
+.manual-current-step { margin: 0; min-width: 0; font-size: 21px; font-weight: 650; letter-spacing: -.02em; }
 .manual-progress-step { min-width: 0; display: grid; grid-template-columns: 23px 1fr; align-items: center; gap: 5px; padding: 6px 3px; border-top: 3px solid var(--inset); color: var(--muted); }
 .manual-progress-step > span { width: 21px; height: 21px; display: grid; place-items: center; border-radius: 50%; background: var(--inset); font-size: 10px; font-weight: 700; }
 .manual-progress-step small { overflow: hidden; text-overflow: ellipsis; font-size: 10px; white-space: nowrap; }
@@ -34,9 +35,8 @@
 .manual-progress-step.is-current > span { background: var(--accent); color: var(--on-accent); }
 .manual-recipe-form, .manual-groceries { display: grid; gap: 18px; }
 .manual-field { display: grid; gap: 7px; min-width: 0; }
-.manual-required-mark { color: #ff3b30; font-weight: 600; }
-.manual-required-note { margin: -6px 0 18px; color: var(--muted); font-size: 12px; font-weight: 400; line-height: 1.4; }
-.manual-groceries > .manual-required-note { margin: 0; }
+.manual-required-mark { color: var(--accent-ink); font-weight: 750; }
+.manual-required-note { flex: 0 0 auto; margin: 0; color: var(--accent-ink); font-size: 12px; font-weight: 400; line-height: 1.4; white-space: nowrap; }
 .manual-entry .manual-field input,
 .manual-entry .manual-field textarea {
   width: 100%;

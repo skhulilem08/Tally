@@ -1,3 +1,4 @@
 - [Project requirements](project-requirements.md) — JavaScript/PWA, iOS feel led by HIG, solid colours/no Glass, Hugeicons, five tabs, and device-only guest kitchens.
 - [Preview routing](preview-routing.md) — Workflow management can regenerate legacy forwarding; validate the public preview proxy, not localhost alone.
 - [Assistant memory safety](assistant-memory-safety.md) — speech corrections undo only derived memory, never unrelated saved preferences; expired rollback history must fail explicitly.
+- [Voice conversation budgets](voice-conversation-budget.md) — recognition, model replies and playback need stage-aware budgets so normal calls do not exhaust a shared counter.

@@ -91,7 +91,7 @@ function ManualEntry({ manual, setManual, approveRecipe, approveGroceries, busy,
 
       {current.kind === 'groceries' && (
         <form className="manual-groceries" onSubmit={saveGroceries}>
-          <RequiredNote />
+          <div className="manual-step-heading"><h2 className="manual-current-step">List details</h2><RequiredNote /></div>
           <label className="field-label manual-field">
             <span>List name<RequiredMark /></span>
             <input value={groceries.name || ''} onChange={(event) => patchGroceries({ name: event.target.value })} required maxLength="120" placeholder="This week’s groceries" data-testid="input-manual-list-name" />
@@ -110,8 +110,10 @@ function ManualEntry({ manual, setManual, approveRecipe, approveGroceries, busy,
           <div className="manual-wizard-progress" role="progressbar" aria-label="Recipe progress" aria-valuemin={0} aria-valuemax={4} aria-valuenow={current.step + 1} aria-valuetext={['Recipe details', 'Ingredients', 'Method', 'Review your recipe'][current.step]}>
             <span style={{ transform: `scaleX(${(current.step + 1) / 4})` }} />
           </div>
-          <h2 className="manual-current-step">{['Recipe details', 'Ingredients', 'Method', 'Review your recipe'][current.step]}</h2>
-          {current.step < 3 && <RequiredNote />}
+          <div className="manual-step-heading">
+            <h2 className="manual-current-step">{['Recipe details', 'Ingredients', 'Method', 'Review your recipe'][current.step]}</h2>
+            {current.step < 3 && <RequiredNote />}
+          </div>
           {current.step === 0 && (
             <form className="manual-recipe-form" onSubmit={goNext}>
               <label className="field-label manual-field"><span>Recipe name<RequiredMark /></span><input autoFocus value={recipe.title || ''} onChange={(event) => patchRecipe({ title: event.target.value })} required maxLength="160" placeholder="Lemon olive oil cake" data-testid="input-manual-recipe-title" /></label>
