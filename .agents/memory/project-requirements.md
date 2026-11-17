@@ -33,6 +33,12 @@ Preserve the approved Settings direction, with rounder corners and more solid wh
 
 **How to apply:** Refine rather than replace the Settings layout. Keep opaque neutral light/dark surfaces and the no-glass constraint.
 
+Use bright Apple-reference orange for light-mode links and actions, not brown/dark-orange text; preserve the approved gold links and actions on black in dark mode. Home's recent-grocery and Add recipe badges use orange backgrounds and white symbols.
+
+**Why:** The user repeatedly corrected brownish light-mode colors and explicitly said the gold-on-black dark-mode links and Done actions were already right.
+
+**How to apply:** Do not silently darken light-mode action orange into brown or change the approved dark gold as part of this correction. Keep neutral whites/greys, distinguish icon fills from text colors, and report contrast limitations honestly rather than claiming all bright-orange text meets accessibility thresholds.
+
 Use Settings' approved visual system for Home, and the Home screenshot only for section arrangement—not product sections or a different theme.
 
 **Why:** The user directed Home content back to the PDF-derived specs, then corrected the interpretation: “the look and feel and design must match setting as for section structure match the img i sent you”.
@@ -122,6 +128,18 @@ AI Assistant's signature interaction is a live voice call with updating recipe a
 **Why:** The user reiterated the original PDF's call-like requirement and explained that they want to talk through adjustments while structured components update without ending the conversation.
 
 **How to apply:** Preserve text as a fallback, explicit approval before recipe/list saves, and guest access. Do not describe text chat or record-and-send voice messages as completion of the live-call requirement. Move the recent recipe/Cookbook and recent list/Groceries shortcuts to opposite ends of the centered Assistant header as icons rather than side-by-side cards.
+
+If Replit's AI connection lacks a native live-call API, implement an automatic speech-to-text → Replit OpenAI → text-to-speech conversation instead.
+
+**Why:** The user explicitly proposed and approved this workaround, asked to use Replit AI, and does not want a separate direct OpenAI key to be a prerequisite.
+
+**How to apply:** Preserve the call-like hands-free interaction rather than manual voice messages. Explain turn-processing pauses honestly; implement real microphone, recognition, playback, interruption and stop behavior. Verify the speech integration's application access and billing rather than assuming development-agent media callbacks are callable by the app.
+
+Show recognized user speech in user message bubbles, with a correction path for misheard wording.
+
+**Why:** The user explicitly wants to see what the speech feature heard so they can notice words they did not actually say.
+
+**How to apply:** Show actual recognition output, not an AI-cleaned paraphrase. Make corrections update the working conversation/draft and reject stale replies; keep automatic saving prohibited. Only show provisional transcription if the provider actually supplies it.
 
 The product assistant needs a private, self-maintained `memory.md` per user, combining a general-facts table with narrative summaries of preferences and situational cooking habits.
 

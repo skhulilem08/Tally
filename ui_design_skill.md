@@ -129,6 +129,8 @@ The addendum confirms **orange primary in light mode; gold replaces orange in da
 
 ### Colour-use rules
 
+- **Latest user correction:** light-mode links and actions use bright Apple-reference orange, not the earlier dark-orange/brown `accent-text` proposal. Apple's currently published default light orange is RGB 255/141/40 (`#FF8D28`); default dark orange is RGB 255/146/48 (`#FF9230`). These web values approximate the published swatches, not dynamic UIKit colors. Keep the approved gold-on-black dark-mode links/actions. Recent groceries and Add recipe on Home use orange badges with white decorative symbols and adjacent identifying text.
+- The bright light orange does **not** meet 4.5:1 for small text on white; the user rejected the darker text alternative. Do not describe this palette choice as a passing text-contrast result. Preserve independently contrasting keyboard focus indicators, dark text on orange filled buttons, and treat an accessible small-link treatment as unresolved rather than silently returning to brown.
 - Give a colour one consistent semantic purpose. Selection, danger, and success must not become interchangeable. [A1]
 - Orange/gold are brand/action accents, not automatic warnings or nutrition indicators.
 - Use pink as tertiary colour, not a second primary or the sole indicator of an actionable control or state.
@@ -203,6 +205,7 @@ For this web app, use WCAG 2.2 thresholds: normal text ≥4.5:1; large text ≥3
 - Settings is the fifth bottom tab and no longer needs repeating in each main-page header. The AI screen retains direct recent-recipe and recent-list shortcuts.
 - On Assistant, present those shortcuts as icon-only links at opposite ends of the centered header: Cookbook/recent recipe on the left, Groceries/recent list on the right. Remove the side-by-side shortcut cards, preserve their destinations and collection fallbacks, and give both meaningful accessible names and at least 44 × 44 CSS px targets.
 - Assistant's primary experience is a live voice call with recipe/grocery components updating within the conversation, not voice messages. Keep readable text as a fallback, real listening/speaking/mute/end controls, and deliberate review/edit states rather than a permanently expanded form consuming the conversation.
+- Spoken user turns must appear as user message bubbles showing the actual recognized wording. Distinguish genuine partial transcription from finalized text, allow correcting/resubmitting misheard turns, and invalidate superseded responses/draft proposals. Do not hide transcription or require confirmation after every sentence.
 - Personal memory uses a compact “Memory updated” event only after a successful write, with a reachable inspect/edit/forget/disable surface. Preserve conversation space and avoid redundant explanations; keep essential provider-processing, device-storage and retention disclosures accessible.
 - Recipe details, list details, account screens, and editors are secondary screens, not additional bottom tabs.
 - Use familiar Back/Cancel controls and browser history. Gestures are optional shortcuts, never the only way out.

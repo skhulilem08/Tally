@@ -744,7 +744,23 @@
   -webkit-tap-highlight-color: transparent;
 }
 .home-add-recipe-tile strong { flex: 1; font-size: 15px; font-weight: 640; }
-.home-add-recipe-tile .home-icon-badge { color: var(--accent-ink); }
+.home-page .home-add-recipe-tile .home-icon-badge,
+.home-page .home-groceries-section .home-icon-badge {
+  background: #ff8d28;
+  color: #ffffff;
+}
+:root[data-theme="dark"] .home-page .home-add-recipe-tile .home-icon-badge,
+:root[data-theme="dark"] .home-page .home-groceries-section .home-icon-badge {
+  background: #ff9230;
+  color: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="system"] .home-page .home-add-recipe-tile .home-icon-badge,
+  :root[data-theme="system"] .home-page .home-groceries-section .home-icon-badge {
+    background: #ff9230;
+    color: #ffffff;
+  }
+}
 .home-add-recipe-tile:active { opacity: .65; }
 .home-recommendations-section { margin-bottom: 24px; }
 .home-feature-recipe, .home-recommendation-row {
