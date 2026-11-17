@@ -268,7 +268,6 @@ function SignInPrompt({ title = 'Your kitchen is yours', children = 'Sign in to 
 function Home({ kitchen, canUseKitchen, user }) {
   const recentRecipes = kitchen.recipes.slice(0, 3)
   const latestList = kitchen.lists[0]
-  const latestRecipe = kitchen.recipes[0]
   const { recommendations } = useRecipeRecommendations(kitchen.recipes, user?.id || 'guest')
   const firstName = user?.firstName
   const [hour] = useState(() => new Date().getHours())
@@ -284,97 +283,15 @@ function Home({ kitchen, canUseKitchen, user }) {
       </header>
 
       <nav className="home-quick-actions" aria-label="Kitchen actions">
-        <Link href="/cookbook/new" className="home-action-chip home-action-primary" data-testid="home-add-recipe"><Plus size={17} />Add recipe</Link>
         <Link href="/groceries/plan" className="home-action-chip" data-testid="home-plan-groceries"><ListChecks size={17} />Plan groceries</Link>
         <Link href="/assistant" className="home-action-chip" aria-label="Ask Tally" data-testid="home-ask-tally"><Sparkles size={17} />Ask Tally</Link>
       </nav>
 
       <ErrorNotice onRetry={kitchen.reload}>{kitchen.error}</ErrorNotice>
 
-      <section className="home-section home-recipes-section" aria-labelledby="home-recipe-heading">
-        <div className="home-section-heading">
-          <h2 id="home-recipe-heading">Recent recipes</h2>
-          <Link href="/cookbook" className="home-section-link">Cookbook<ChevronRight size={16} /></Link>
-        </div>
-        {!canUseKitchen || kitchen.loading
-          ? <div className="home-recipe-rail" aria-label="Loading recent recipes"><div className="home-recipe-skeleton" /><div className="home-recipe-skeleton" /></div>
-          : recentRecipes.length
-            ? <div className="home-recipe-rail" aria-label="Recent saved recipes">
-                {recentRecipes.map((recipe, index) => {
-                  const ingredients = (recipe.ingredients || []).filter((item) => item.name?.trim())
-                  return <Link key={recipe.id} className="home-recipe-card" href={`/cookbook/${recipe.id}`} data-testid={`home-recipe-${recipe.id}`}>
-                    <div className="home-card-topline">
-                      <span className="home-icon-badge"><BookOpen size={18} /></span>
-                      <span className="home-card-rank">{index === 0 ? 'Latest recipe' : 'Saved recipe'}</span>
-                      <ChevronRight size={18} className="home-card-chevron" />
-                    </div>
-                    <strong className="home-recipe-title">{recipe.title}</strong>
-                    <span className="home-recipe-serving">{recipe.servings} servings{recipe.prepMinutes != null ? ` · ${recipe.prepMinutes} min prep` : ''}</span>
-                    {!!ingredients.length && <span className="home-ingredient-preview">
-                      <span className="home-preview-label">Ingredients</span>
-                      <span className="home-ingredient-names">{ingredients.slice(0, 3).map((item) => item.name).join(' · ')}</span>
-                    </span>}
-                  </Link>
-                })}
-              </div>
-            : <div className="home-empty-collection">
-                <span className="home-icon-badge"><BookOpen size={18} /></span>
-                <span><strong>No saved recipes yet</strong><small>Add a recipe to start your cookbook.</small></span>
-                <Link href="/cookbook/new" className="home-empty-link">Add recipe<ChevronRight size={16} /></Link>
-              </div>}
-      </section>
-
-      <section className="home-section home-feature-section" aria-labelledby="home-feature-heading">
-        <div className="home-section-heading">
-          <h2 id="home-feature-heading">Your latest recipe</h2>
-          <Link href="/cookbook" className="home-section-link">Cookbook<ChevronRight size={16} /></Link>
-        </div>
-        {!canUseKitchen || kitchen.loading
-          ? <div className="home-feature-skeleton" aria-label="Loading your latest recipe"><span /><span /></div>
-          : latestRecipe
-            ? <Link className="home-feature-recipe" href={`/cookbook/${latestRecipe.id}`} data-testid={`home-latest-recipe-${latestRecipe.id}`}>
-                <span className="home-icon-badge"><BookOpen size={18} /></span>
-                <span className="home-feature-copy">
-                  <strong>{latestRecipe.title}</strong>
-                  <small>{latestRecipe.servings} servings{latestRecipe.prepMinutes != null ? ` · ${latestRecipe.prepMinutes} min prep` : ''}</small>
-                </span>
-                <ChevronRight size={18} className="home-card-chevron" />
-              </Link>
-            : <div className="home-quiet-empty" data-testid="home-latest-recipe-empty">
-                <span className="home-empty-dot" aria-hidden="true" />
-                <p>Your saved recipes will appear here as you add them.</p>
-              </div>}
-      </section>
-
-      <section className="home-section home-recommendations-section" aria-labelledby="home-recommendations-heading">
-        <div className="home-section-heading">
-          <h2 id="home-recommendations-heading">Most opened</h2>
-          <Link href="/cookbook" className="home-section-link">Cookbook<ChevronRight size={16} /></Link>
-        </div>
-        {!canUseKitchen || kitchen.loading
-          ? <div className="home-recommendations-skeleton" aria-label="Loading most opened recipes"><span /><span /></div>
-          : recommendations.length
-            ? <div className="home-recommendation-list" aria-label="Most opened recipes">
-                {recommendations.map(({ recipe, openCount }) => (
-                  <Link key={recipe.id} className="home-recommendation-row" href={`/cookbook/${recipe.id}`} data-testid={`home-recommendation-${recipe.id}`}>
-                    <span className="home-icon-badge"><BookOpen size={18} /></span>
-                    <span className="home-recommendation-copy">
-                      <strong>{recipe.title}</strong>
-                      <small>Opened {openCount} {openCount === 1 ? 'time' : 'times'}</small>
-                    </span>
-                    <ChevronRight size={18} className="home-card-chevron" />
-                  </Link>
-                ))}
-              </div>
-            : <div className="home-quiet-empty" data-testid="home-recommendations-empty">
-                <span className="home-empty-dot" aria-hidden="true" />
-                <p>Your most-opened recipes will appear here.</p>
-              </div>}
-      </section>
-
       <section className="home-section home-groceries-section" aria-labelledby="home-grocery-heading">
         <div className="home-section-heading">
-          <h2 id="home-grocery-heading">Latest grocery list</h2>
+          <h2 id="home-grocery-heading">Recent groceries</h2>
           <Link href="/groceries" className="home-section-link">All lists<ChevronRight size={16} /></Link>
         </div>
         {!canUseKitchen || kitchen.loading
@@ -404,6 +321,70 @@ function Home({ kitchen, canUseKitchen, user }) {
                 <Link href="/groceries/plan" className="home-empty-link">Plan groceries<ChevronRight size={16} /></Link>
               </div>}
       </section>
+
+      <section className="home-section home-recipes-section" aria-labelledby="home-recipe-heading">
+        <div className="home-section-heading">
+          <h2 id="home-recipe-heading">Recent recipes</h2>
+          <Link href="/cookbook" className="home-section-link">Cookbook<ChevronRight size={16} /></Link>
+        </div>
+        <Link href="/cookbook/new" className="home-add-recipe-tile" data-testid="home-add-recipe">
+          <span className="home-icon-badge"><Plus size={20} /></span>
+          <strong>Add recipe</strong>
+          <ChevronRight size={18} className="home-card-chevron" />
+        </Link>
+        {!canUseKitchen || kitchen.loading
+          ? <div className="home-recipe-rail" aria-label="Loading recent recipes"><div className="home-recipe-skeleton" /><div className="home-recipe-skeleton" /></div>
+          : recentRecipes.length
+            ? <div className="home-recipe-rail" aria-label="Recent saved recipes">
+                {recentRecipes.map((recipe, index) => {
+                  const ingredients = (recipe.ingredients || []).filter((item) => item.name?.trim())
+                  return <Link key={recipe.id} className="home-recipe-card" href={`/cookbook/${recipe.id}`} data-testid={`home-recipe-${recipe.id}`}>
+                    <div className="home-card-topline">
+                      <span className="home-icon-badge"><BookOpen size={18} /></span>
+                      <span className="home-card-rank">{index === 0 ? 'Latest recipe' : 'Saved recipe'}</span>
+                      <ChevronRight size={18} className="home-card-chevron" />
+                    </div>
+                    <strong className="home-recipe-title">{recipe.title}</strong>
+                    <span className="home-recipe-serving">{recipe.servings} servings{recipe.prepMinutes != null ? ` · ${recipe.prepMinutes} min prep` : ''}</span>
+                    {!!ingredients.length && <span className="home-ingredient-preview">
+                      <span className="home-preview-label">Ingredients</span>
+                      <span className="home-ingredient-names">{ingredients.slice(0, 3).map((item) => item.name).join(' · ')}</span>
+                    </span>}
+                  </Link>
+                })}
+              </div>
+            : <div className="home-quiet-empty" data-testid="home-recent-recipes-empty">
+                <span className="home-empty-dot" aria-hidden="true" />
+                <p>Your recent recipes will appear here.</p>
+              </div>}
+      </section>
+
+      <section className="home-section home-recommendations-section" aria-labelledby="home-recommendations-heading">
+        <div className="home-section-heading">
+          <h2 id="home-recommendations-heading">Most opened</h2>
+          <Link href="/cookbook" className="home-section-link">Cookbook<ChevronRight size={16} /></Link>
+        </div>
+        {!canUseKitchen || kitchen.loading
+          ? <div className="home-recommendations-skeleton" aria-label="Loading most opened recipes"><span /><span /></div>
+          : recommendations.length
+            ? <div className="home-recommendation-list" aria-label="Most opened recipes">
+                {recommendations.map(({ recipe, openCount }) => (
+                  <Link key={recipe.id} className="home-recommendation-row" href={`/cookbook/${recipe.id}`} data-testid={`home-recommendation-${recipe.id}`}>
+                    <span className="home-icon-badge"><BookOpen size={18} /></span>
+                    <span className="home-recommendation-copy">
+                      <strong>{recipe.title}</strong>
+                      <small>Opened {openCount} {openCount === 1 ? 'time' : 'times'}</small>
+                    </span>
+                    <ChevronRight size={18} className="home-card-chevron" />
+                  </Link>
+                ))}
+              </div>
+            : <div className="home-quiet-empty" data-testid="home-recommendations-empty">
+                <span className="home-empty-dot" aria-hidden="true" />
+                <p>Your most-opened recipes will appear here.</p>
+              </div>}
+      </section>
+
     </div>
   )
 }

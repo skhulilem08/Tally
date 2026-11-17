@@ -208,6 +208,7 @@ The new addendum resolves the earlier screenshot/PDF navigation conflicts: five 
 
 ### Home design
 
+- Put Recent groceries above recipe sections. Combine latest and recent recipes under one Recent recipes heading; newest recipes come first. Stack the Add recipe tile above recipe cards or the visible dot empty state on mobile, never alongside that state. Keep Most opened distinct and remove the separate latest-recipe promotion.
 - Home-specific visual reference: `attached_assets/IMG_1984_1794827303234.webp`. The user supplied it to show native Home composition and feel, **not** to adopt its fashion-shopping content. Apply its compact greeting, clear section rhythm, appropriately sized controls and mobile collections to Tally's kitchen content.
 - **User clarification:** Home must use the approved **Settings look, feel and design system**. The Home image guides the **section arrangement**, not a different visual theme. Reuse Settings' solid neutral white/grey/black surfaces, rounded geometry, Hugeicons and control treatment.
 - Use solid filled components without decorative card borders or outlined chips/buttons. Separate surfaces with spacing and contrasting opaque fills; retain meaningful thin row separators and accessible keyboard focus indicators. This is Tally's chosen treatment, not a claim that HIG universally prohibits every kind of outline.

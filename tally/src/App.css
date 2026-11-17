@@ -730,7 +730,23 @@
 .home-empty-collection strong { font-size: 14px; font-weight: 620; }
 .home-empty-collection small { color: var(--muted); font-size: 12px; line-height: 1.35; }
 .home-empty-link { display: inline-flex; align-items: center; gap: 4px; min-width: 44px; min-height: 44px; color: var(--accent-ink); text-decoration: none; font-size: 12px; font-weight: 650; white-space: nowrap; }
-.home-feature-section, .home-recommendations-section { margin-bottom: 24px; }
+.home-add-recipe-tile {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 70px;
+  margin-bottom: 12px;
+  padding: 11px 14px;
+  border-radius: 22px;
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.home-add-recipe-tile strong { flex: 1; font-size: 15px; font-weight: 640; }
+.home-add-recipe-tile .home-icon-badge { color: var(--accent-ink); }
+.home-add-recipe-tile:active { opacity: .65; }
+.home-recommendations-section { margin-bottom: 24px; }
 .home-feature-recipe, .home-recommendation-row {
   display: flex;
   align-items: center;

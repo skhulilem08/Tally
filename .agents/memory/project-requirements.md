@@ -93,6 +93,12 @@ Home promotional content must feature existing saved recipes and meals, with vis
 
 **How to apply:** Keep concise empty-state text explaining what personal content will appear. Do not invent catalogue records or hide empty promotion/recommendation sections. Treat opens as interest, not proof a recipe was cooked; recommendations must belong to the current kitchen.
 
+Put Recent groceries above recipe sections. Merge latest and recent recipes into one Recent recipes section, newest first, with the Add recipe tile above the cards or empty state on mobile.
+
+**Why:** The user wants the small, less frequently used grocery section to remain discoverable rather than be pushed below variable recipe content. They explicitly corrected “beside” to “below” for mobile and approved merging the duplicate recipe sections.
+
+**How to apply:** Keep the latest grocery list compact near the top. Within Recent recipes, stack Add recipe then recent cards or “Your recent recipes will appear here.” Do not restore a separate latest-recipe section. Keep Most opened distinct.
+
 Use IndexedDB for future local-first storage with architect guidance; include truthful sync tracking in Settings when that feature is implemented.
 
 **Why:** The user chose “IndexedDB ... with architect guidance” and asked for sync to be trackable in Settings, then explicitly deferred implementation to focus on Settings design.

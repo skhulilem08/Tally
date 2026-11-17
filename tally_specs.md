@@ -115,8 +115,10 @@ PWA installation must use a valid manifest, suitable icons, secure hosting, and 
 
 **Existing modules and optional extensions:**
 
+- **Confirmed section order:** Recent groceries comes before Recent recipes and Most opened, so variable recipe content cannot bury the compact latest grocery list.
+- **Recent recipes:** merge latest-recipe promotion into this single section, with newest saved recipes first. Keep one Add recipe tile within the section, with recipe cards or the visible dot empty state (“Your recent recipes will appear here.”) below it on mobile, not beside it. Do not repeat a separate Your latest recipe section.
 - **Welcome header:** short personal greeting and uncluttered identity.
-- **Continue cooking:** one-tap return to the latest recipe's details; no invented cooking-progress tracking.
+- **Continue cooking:** if adopted later, use existing recipe details with no invented cooking-progress tracking; do not duplicate the recent-recipe section.
 - **Latest grocery list:** reopen the current list without searching history.
 - **Talk to your AI:** navigate to a conversation, with voice starting only after an explicit microphone action.
 - **Quick kitchen overview:** optional summaries based on real saved activity; never fabricate inventory quantities.
