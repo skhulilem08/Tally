@@ -10,9 +10,17 @@
   .field-pair, .ingredient-input-row, .manual-recipe-numbers,
   .manual-ingredient-row, .assistant-draft-numbers, .assistant-edit-row,
   .memory-settings-fact
-) input {
+) :is(input, select) {
   box-sizing: border-box;
   min-width: 0;
   height: 52px;
   min-height: 52px;
+}
+
+/* Removal is destructive; closing a sheet or going back is not. */
+.remove-row,
+.manual-remove-row,
+.assistant-row-remove,
+.memory-settings-fact .memory-settings-icon-action {
+  color: var(--danger);
 }

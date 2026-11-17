@@ -165,6 +165,12 @@ Mark required form fields with bold orange/light or gold/dark asterisks, omit â€
 
 **How to apply:** Group each label and its asterisk in one inline wrapper. Do not create a separate grid row for an optional/required marker or add a disclaimer card.
 
+Ingredient rows should give the name the remaining space on the left, with Amount and a Unit dropdown at the far right. Destructive controls can use red.
+
+**Why:** The user identified cramped mobile ingredient fields, wrapped Amount asterisks and unused space at the far right; they requested a dropdown and clarified that red is appropriate for destructive actions.
+
+**How to apply:** Do not reserve an empty remove-button column. Keep labels and asterisks together and use native unit selection without discarding existing values. Required markers remain orange/gold, not destructive red.
+
 Light-mode orange-filled buttons must use white text and white icons, and touch/mouse interactions must not show browser-style square focus boxes.
 
 **Why:** The user explicitly requested these consistency corrections across the app and repeated that both text and icons on orange buttons must be white in light mode.

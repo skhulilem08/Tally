@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Check, Plus, X } from '../icons.jsx'
 import KitchenAnimation from './KitchenAnimation.jsx'
 import AutoTextarea from './AutoTextarea.jsx'
+import IngredientUnitSelect from './IngredientUnitSelect.jsx'
 import './ManualEntry.css'
 
 const RequiredMark = () => <span className="manual-required-mark" aria-hidden="true"> *</span>
@@ -134,8 +135,8 @@ function ManualEntry({ manual, setManual, approveRecipe, approveGroceries, busy,
                   <div className="manual-ingredient-row" key={`manual-ingredient-${index}`}>
                     <label className="field-label manual-field ingredient-name"><span>Ingredient<RequiredMark /></span><input aria-label={`Ingredient ${index + 1}`} value={ingredient.name || ''} onChange={(event) => patchRecipe({ ingredients: recipe.ingredients.map((item, i) => i === index ? { ...item, name: event.target.value } : item) })} required placeholder="Ingredient" /></label>
                     <label className="field-label manual-field ingredient-amount"><span>Amount<RequiredMark /></span><input aria-label={`Amount for ingredient ${index + 1}`} type="number" min="0.0001" step="any" value={ingredient.amount ?? ''} onChange={(event) => patchRecipe({ ingredients: recipe.ingredients.map((item, i) => i === index ? { ...item, amount: event.target.value } : item) })} required placeholder="1" /></label>
-                    <label className="field-label manual-field ingredient-unit"><span>Unit<RequiredMark /></span><input aria-label={`Unit for ingredient ${index + 1}`} value={ingredient.unit || ''} onChange={(event) => patchRecipe({ ingredients: recipe.ingredients.map((item, i) => i === index ? { ...item, unit: event.target.value } : item) })} required placeholder="cup" /></label>
-                    {recipe.ingredients.length > 1 && <button type="button" className="manual-remove-row" aria-label={`Remove ingredient ${index + 1}`} onClick={() => patchRecipe({ ingredients: recipe.ingredients.filter((_, i) => i !== index) })}><X size={17} /></button>}
+                    <label className="field-label manual-field ingredient-unit"><span>Unit<RequiredMark /></span><IngredientUnitSelect aria-label={`Unit for ingredient ${index + 1}`} value={ingredient.unit || ''} onChange={(event) => patchRecipe({ ingredients: recipe.ingredients.map((item, i) => i === index ? { ...item, unit: event.target.value } : item) })} required /></label>
+                    {recipe.ingredients.length > 1 && <button type="button" className="manual-remove-ingredient" aria-label={`Remove ingredient ${index + 1}`} onClick={() => patchRecipe({ ingredients: recipe.ingredients.filter((_, i) => i !== index) })}>Remove</button>}
                   </div>
                 ))}
               </div>

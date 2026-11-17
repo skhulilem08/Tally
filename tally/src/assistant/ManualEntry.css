@@ -38,6 +38,7 @@
 .manual-required-mark { color: var(--accent-ink); font-weight: 750; }
 .manual-required-note { flex: 0 0 auto; margin: 0; color: var(--accent-ink); font-size: 12px; font-weight: 400; line-height: 1.4; white-space: nowrap; }
 .manual-entry .manual-field input,
+.manual-entry .manual-field select,
 .manual-entry .manual-field textarea {
   width: 100%;
   min-width: 0;
@@ -56,6 +57,7 @@
   box-shadow: none;
 }
 .manual-entry .manual-field input:focus,
+.manual-entry .manual-field select:focus,
 .manual-entry .manual-field textarea:focus { border: 0; box-shadow: none; }
 .manual-field textarea { min-height: 72px; }
 .manual-optional { margin-left: 3px; color: var(--muted); font-size: 11px; font-weight: 430; }
@@ -64,7 +66,14 @@
 .manual-actions .button { width: 100%; }
 .manual-add-row { justify-self: start; }
 .manual-ingredients { display: grid; gap: 8px; }
-.manual-ingredient-row { display: grid; grid-template-columns: minmax(0, 1fr) 72px 75px 31px; gap: 5px; align-items: end; }
+.manual-ingredient-row { display: grid; grid-template-columns: minmax(0, 1fr) 80px 94px; column-gap: 8px; row-gap: 0; align-items: end; }
+.manual-ingredient-row .manual-field > span:first-child { white-space: nowrap; }
+.manual-ingredient-row .manual-field input { padding-inline: 10px; }
+.manual-unit-picker { position: relative; display: block; width: 100%; min-width: 0; }
+.manual-entry .manual-unit-picker select { height: 52px; padding-inline: 10px 26px; cursor: pointer; }
+.manual-unit-picker select:invalid { color: var(--muted); }
+.manual-unit-chevron { position: absolute; right: 9px; top: 50%; transform: translateY(-50%) rotate(90deg); color: var(--muted); pointer-events: none; }
+.manual-remove-ingredient { grid-column: 1 / -1; justify-self: end; min-height: 44px; padding: 8px 0 8px 12px; border: 0; background: transparent; color: var(--danger); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
 .manual-remove-row { width: 31px; height: 40px; display: grid; place-items: center; border: 0; border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; }
 .manual-remove-row:hover { background: var(--inset); }
 .manual-method-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
@@ -89,10 +98,11 @@
 
 .manual-entry button:focus-visible,
 .manual-entry input:focus-visible,
+.manual-entry select:focus-visible,
 .manual-entry textarea:focus-visible { outline: 3px solid var(--outline); outline-offset: 3px; }
 
 @media (max-width: 480px) {
-  .manual-ingredient-row { grid-template-columns: minmax(0, 1fr) 57px 58px 27px; gap: 4px; }
+  .manual-ingredient-row { grid-template-columns: minmax(0, 1fr) 72px 84px; column-gap: 6px; }
   .manual-remove-row { width: 27px; }
   .manual-progress-step { grid-template-columns: 20px 1fr; gap: 4px; }
   .manual-progress-step small { font-size: 9px; }
