@@ -201,6 +201,9 @@ For this web app, use WCAG 2.2 thresholds: normal text ≥4.5:1; large text ≥3
 - Keep all destinations available even when their collections are empty; explain empty states rather than disabling tabs.
 - Use a solid tab bar with a visible active state, icon, label, and safe-area padding.
 - Settings is the fifth bottom tab and no longer needs repeating in each main-page header. The AI screen retains direct recent-recipe and recent-list shortcuts.
+- On Assistant, present those shortcuts as icon-only links at opposite ends of the centered header: Cookbook/recent recipe on the left, Groceries/recent list on the right. Remove the side-by-side shortcut cards, preserve their destinations and collection fallbacks, and give both meaningful accessible names and at least 44 × 44 CSS px targets.
+- Assistant's primary experience is a live voice call with recipe/grocery components updating within the conversation, not voice messages. Keep readable text as a fallback, real listening/speaking/mute/end controls, and deliberate review/edit states rather than a permanently expanded form consuming the conversation.
+- Personal memory uses a compact “Memory updated” event only after a successful write, with a reachable inspect/edit/forget/disable surface. Preserve conversation space and avoid redundant explanations; keep essential provider-processing, device-storage and retention disclosures accessible.
 - Recipe details, list details, account screens, and editors are secondary screens, not additional bottom tabs.
 - Use familiar Back/Cancel controls and browser history. Gestures are optional shortcuts, never the only way out.
 

@@ -175,6 +175,33 @@ The consistent template is confirmed; exact required fields and media placement 
 - Explain ambiguities and let the person correct the result.
 - Open recent saved recipe/list without searching.
 
+### Live conversation is the primary experience
+
+**User clarification:** this means a continuous two-way voice conversation resembling a call, not recording and sending voice messages. Text chat is an accessibility and recovery fallback, not completion of the live-conversation requirement.
+
+- Start only after the user explicitly chooses to begin a call; merely visiting the tab never requests microphone access.
+- Keep recipe and grocery draft components within the ongoing conversation. Spoken or typed corrections update the same app-defined components without ending the call.
+- Support listening, speaking, interruption, mute, end, permission denial and connection-loss recovery as real states. Do not animate an unavailable voice connection as if it were working.
+- Grocery proposals select saved recipe IDs, serving counts and reported inventory; the existing deterministic calculator produces quantities, warnings and the approval fingerprint.
+- Voice tools may propose changes, never save recipes or lists. Explicit review/approval remains separate from conversation and personal-memory updates.
+- Guard proposals against late responses after manual edits, dismissal, newer draft revisions, call end or account changes. Preserve approval request identities across retries and prevent duplicate writes.
+- Replace the two Assistant shortcut cards with icon-only header links: Cookbook/recent recipe on the left, Groceries/recent list on the right, and the title centered between balanced touch targets. Preserve latest-item destinations and collection fallbacks.
+
+**Connection status:** the configured Replit OpenAI integration supports the existing text assistant and audio requests, but not the Realtime API required for the selected WebRTC approach. Direct OpenAI Realtime access requires a separate server-side credential and approval of its separate provider billing. Do not substitute the integration credential, expose a long-lived key to the browser, or claim a verified live call before the provider connection and actual audio have been tested.
+
+### Personal assistant memory
+
+**Confirmed by the user:** maintain a private `memory.md` representation for each person, with a table of general facts and prose describing learned cooking preferences, recurring context, and useful conversation summaries. This is app-user data, not a shared repository file or the development agent's memory.
+
+- Use relevant memory to personalize later conversations, including context-dependent servings and family cooking habits when the person actually supplies that information. Do not invent traits or infer sensitive attributes.
+- Handle explicit remember, correct and forget requests. Routine useful learning may update memory automatically; acknowledge an explicit remember request naturally.
+- Show a compact **Memory updated** chat event only after persistence succeeds. Do not claim to remember after a failed write.
+- Allow the person to inspect, edit, clear or disable memory. Forgetting must also prevent pending extraction or retained summaries from restoring the forgotten detail.
+- Separate each account's authorized cloud memory/conversation history from device-only guest memory/history. No silent guest upload, account merge, or fallback from a failed cloud write into guest storage.
+- Persist guest conversations, recoverable drafts and summaries across reopening as part of this Assistant upgrade; their current session-only implementation is not completion of that requirement.
+- Bound retained messages and summaries, use atomic version checks for concurrent changes, and report blocked/full/corrupt storage. Retention and deletion controls must match actual behavior.
+- Explain that relevant conversation/memory context and live audio are sent to the provider for processing. Do not retain raw audio in the app by default or put secrets in memory.
+
 ### Required interaction safeguards
 
 Text fallback is recommended in the PDF and required by this accessibility design guide.

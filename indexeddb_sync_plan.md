@@ -11,7 +11,7 @@ The user chose IndexedDB with architect guidance, then explicitly paused that im
 - Make each saved change and its pending-sync operation durable in one IndexedDB transaction before showing success.
 - Receive other-device changes through two-way sync while connected. Local speed is not proof of fresh cloud data.
 - Retain pending changes offline and retry with the same operation IDs after reconnection.
-- AI chat still requires an account and connection.
+- AI chat and live conversation are available to guests as well as signed-in users and require an online provider connection. Guest Assistant memory/history remains device-only; this does not authorize the wider IndexedDB/cloud-sync rollout.
 
 ## Architect guidance
 
